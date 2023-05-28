@@ -32,7 +32,7 @@
 		[
 			[null, 'S', 'S'],
 			['S', 'S', null],
-			[null, null, null]
+			[null, 'S', null]
 		],
 		// Z 赤
 		[
@@ -60,24 +60,18 @@
 		]
 	]
 
-	const getRandomMino = () => {
-		const mino = minos[2]
-		// console.log(
-		// 	JSON.stringify(
-		// 		mino.map((_, y) => _.map((v, x) => ({ y, x, value: v }))),
-		// 		null,
-		// 		2
-		// 	)
-		// )
+	let currentMino: { y: number; x: number; value: Field }[][]
 
+	// 配列の0~6をランダムの順番にする
+	const getRandomMino = () => {
+		const mino = structuredClone(minos[2])
+		// console.log(JSON.stringify(mino.map((_, y) => _.map((v, x) => ({ y, x, value: v }))),null,2))
 		// ここでxの位置を初期値（左上をx:3,y:0にする）
 		return mino.map((_, y) => _.map((v, x) => ({ y, x: x + 3, value: v })))
 	}
 
-	let currentMino: { y: number; x: number; value: Field }[][] = getRandomMino()
-
-	// 新しいcurrentMinoを初期位置にセット
-	const setNewMino = () => {
+	// currentMinoをフィールドの初期位置にセット
+	const setMinoToFields = () => {
 		for (let iy = 0; iy < currentMino.length; iy++) {
 			const fieldsX = currentMino[iy]
 			for (let ix = 0; ix < fieldsX.length; ix++) {
@@ -88,31 +82,44 @@
 		}
 	}
 
-	setNewMino()
+	const changeNextMino = () => {
+		currentMino = getRandomMino()
+		setMinoToFields()
+	}
+
+	// let currentMino: { y: number; x: number; value: Field }[][] = getRandomMino()
+	changeNextMino()
 
 	let isBroken = false
+
 	// 一定時間後に下にずらす
 	setInterval(() => {
 		// currentMinoの位置をずらす
 		// 後ろからやる（先に地面に着くから）
-		if (isBroken) return
+
+		// if (isBroken) return
 		for (let iy = currentMino.length - 1; iy >= 0; iy--) {
 			const fieldsX = currentMino[iy]
 			for (let ix = 0; ix < fieldsX.length; ix++) {
 				const field = currentMino[iy][ix]
-				if (field.y >= 19) {
-					console.log('break!')
-					isBroken = true
-					break
-				} // 一番下に着いた
+				console.log('ループしてるよ')
 
-				field.y++
-				const { x, y, value } = field
+				// 一番下に着いた
+				if (field.y >= 19) {
+					console.log('break!', field.y)
+					changeNextMino()
+					// isBroken = true
+					return
+				}
+
+				currentMino[iy][ix].y += 1
+				const { x, y, value } = currentMino[iy][ix]
 				fields[y][x] = value // 次の位置に移動
 				fields[y - 1][x] = null // 前の位置をnullに
 			}
 		}
-	}, 100)
+		console.log('breakの後に実行')
+	}, 400)
 </script>
 
 <h1 class="font-bold text-center text-40px">テトリス</h1>
@@ -121,14 +128,34 @@
 	{#each fields as field1, y (y)}
 		<div class="flex">
 			{#each field1 as field, x (x)}
-				<div class="border h-7 w-7">{field}</div>
+				<!-- <div class="border h-7 w-7">{field}</div> -->
+				<div
+					class={`border h-7 w-7 ${
+						currentMino.flat().find(pos => pos.x === x && pos.y === y) &&
+						'bg-red-100'
+					} `}
+				>
+					{field}
+				</div>
 			{/each}
 		</div>
 	{/each}
 </div>
 
+<p>current</p>
 <div>
 	{#each currentMino as field1, y (y)}
+		<div class="flex">
+			{#each field1 as field, x (x)}
+				<div class="border h-7">{JSON.stringify(field)}</div>
+			{/each}
+		</div>
+	{/each}
+</div>
+
+<p>minos[2]</p>
+<div>
+	{#each minos[2] as field1, y (y)}
 		<div class="flex">
 			{#each field1 as field, x (x)}
 				<div class="border h-7">{JSON.stringify(field)}</div>
