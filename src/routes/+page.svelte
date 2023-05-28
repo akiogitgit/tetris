@@ -61,7 +61,7 @@
 	]
 
 	const getRandomMino = () => {
-		const mino = minos[0]
+		const mino = minos[2]
 		// console.log(
 		// 	JSON.stringify(
 		// 		mino.map((_, y) => _.map((v, x) => ({ y, x, value: v }))),
@@ -70,27 +70,49 @@
 		// 	)
 		// )
 
-		// ここでxの位置を初期値（左上を3にする）
-		return mino.map((_, y) => _.map((v, x) => ({ y, x, value: v })))
+		// ここでxの位置を初期値（左上をx:3,y:0にする）
+		return mino.map((_, y) => _.map((v, x) => ({ y, x: x + 3, value: v })))
 	}
 
 	let currentMino: { y: number; x: number; value: Field }[][] = getRandomMino()
 
 	// 新しいcurrentMinoを初期位置にセット
 	const setNewMino = () => {
-		// [0][4] が左上で置く
-		for (let y = 0; y < currentMino.length; y++) {
-			const fieldsX = currentMino[y]
-			for (let x = 0; x < fieldsX.length; x++) {
-				console.log(y, x)
-				const field = currentMino[y][x]
-				fields[y][x] = field.value
+		for (let iy = 0; iy < currentMino.length; iy++) {
+			const fieldsX = currentMino[iy]
+			for (let ix = 0; ix < fieldsX.length; ix++) {
+				const field = currentMino[iy][ix]
+				const { x, y, value } = field
+				fields[y][x] = value
 			}
 		}
 	}
 
 	setNewMino()
-	console.log(currentMino)
+
+	let isBroken = false
+	// 一定時間後に下にずらす
+	setInterval(() => {
+		// currentMinoの位置をずらす
+		// 後ろからやる（先に地面に着くから）
+		if (isBroken) return
+		for (let iy = currentMino.length - 1; iy >= 0; iy--) {
+			const fieldsX = currentMino[iy]
+			for (let ix = 0; ix < fieldsX.length; ix++) {
+				const field = currentMino[iy][ix]
+				if (field.y >= 19) {
+					console.log('break!')
+					isBroken = true
+					break
+				} // 一番下に着いた
+
+				field.y++
+				const { x, y, value } = field
+				fields[y][x] = value // 次の位置に移動
+				fields[y - 1][x] = null // 前の位置をnullに
+			}
+		}
+	}, 100)
 </script>
 
 <h1 class="font-bold text-center text-40px">テトリス</h1>
@@ -100,6 +122,16 @@
 		<div class="flex">
 			{#each field1 as field, x (x)}
 				<div class="border h-7 w-7">{field}</div>
+			{/each}
+		</div>
+	{/each}
+</div>
+
+<div>
+	{#each currentMino as field1, y (y)}
+		<div class="flex">
+			{#each field1 as field, x (x)}
+				<div class="border h-7">{JSON.stringify(field)}</div>
 			{/each}
 		</div>
 	{/each}
