@@ -1,4 +1,4 @@
-import { FIELD_HIGHT } from './+page.svelte'
+import { FIELD_HIGHT, FIELD_WIDTH } from './+page.svelte'
 
 type Color = 'I' | 'O' | 'S' | 'Z' | 'J' | 'L' | 'T'
 type Field = null | Color
@@ -143,7 +143,7 @@ const spawnMinoInField = (
 
 // currentMinoを下にずらせるかチェック
 // ずらせるなら、ずらした後のfields, currentMinoを返す
-export const ableToSlideDown = (
+export const ableToMoveDown = (
 	fields: Field[][],
 	activeMino: CurrentMino
 ): false | { fields: Field[][]; activeMino: CurrentMino } => {
@@ -171,6 +171,68 @@ export const ableToSlideDown = (
 			const { x, y, value } = field
 			testFields[y][x] = value // 次の位置に移動
 			testFields[y - 1][x] = null // 前にいた位置をnullに
+		}
+	}
+
+	return { fields: testFields, activeMino: testCurrentMino }
+}
+
+export const ableToMoveRight = (fields: Field[][], activeMino: CurrentMino) => {
+	const testFields = structuredClone(fields)
+	const testCurrentMino = structuredClone(activeMino)
+
+	// currentMinoを1まとまりで、1つでも無理ならfalse
+	for (let ix = activeMino.length - 1; ix >= 0; ix--) {
+		const fieldsX = activeMino[ix]
+
+		for (let iy = 0; iy < fieldsX.length; iy++) {
+			// 下にずらす
+			testCurrentMino[iy][ix].x += 1
+			const field = testCurrentMino[iy][ix]
+			console.log(iy, ix, field)
+
+			if (!field.value) continue // nullは無視
+
+			// 一番下に着いた or ミノにぶつかる
+			if (field.x > FIELD_WIDTH - 1 || testFields[field.y][field.x]) {
+				console.log('break!', field)
+				return false
+			}
+
+			const { x, y, value } = field
+			testFields[y][x] = value // 次の位置に移動
+			testFields[y][x - 1] = null // 前にいた位置をnullに
+		}
+	}
+
+	return { fields: testFields, activeMino: testCurrentMino }
+}
+
+export const ableToMoveLeft = (fields: Field[][], activeMino: CurrentMino) => {
+	const testFields = structuredClone(fields)
+	const testCurrentMino = structuredClone(activeMino)
+
+	// currentMinoを1まとまりで、1つでも無理ならfalse
+	for (let iy = 0; iy < activeMino.length; iy++) {
+		const fieldsX = activeMino[iy]
+
+		for (let ix = 0; ix < fieldsX.length; ix++) {
+			// 下にずらす
+			testCurrentMino[iy][ix].x -= 1
+			const field = testCurrentMino[iy][ix]
+			console.log(iy, ix, field)
+
+			if (!field.value) continue // nullは無視
+
+			// 一番下に着いた or ミノにぶつかる
+			if (field.x < 0 || testFields[field.y][field.x]) {
+				console.log('break!', field)
+				return false
+			}
+
+			const { x, y, value } = field
+			testFields[y][x] = value // 次の位置に移動
+			testFields[y][x + 1] = null // 前にいた位置をnullに
 		}
 	}
 

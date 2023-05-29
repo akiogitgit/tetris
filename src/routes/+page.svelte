@@ -10,7 +10,13 @@
 <script lang="ts">
 	import Fields from '../components/Fields.svelte'
 	import NextMino from '../components/NextMino.svelte'
-	import { ableToSlideDown, getNextActiveMino, getRandomMinos } from './game'
+	import {
+		ableToMoveRight,
+		ableToMoveDown,
+		getNextActiveMino,
+		getRandomMinos,
+		ableToMoveLeft
+	} from './game'
 
 	// ルール
 	// 20 * 10
@@ -22,8 +28,13 @@
 
 	// 各ミノは4*4, 5*5で持っとくといいか？回転を考えると
 
-	let fields: Field[][] = [...Array(FIELD_HIGHT)].map(() =>
-		[...Array(FIELD_WIDTH)].map(() => null)
+	// let fields: Field[][] = [...Array(FIELD_HIGHT)].map(() =>
+	// 	[...Array(FIELD_WIDTH)].map(() => null)
+	// )
+	let fields: Field[][] = [...Array(FIELD_HIGHT)].map((_, y) =>
+		[...Array(FIELD_WIDTH)].map((_, x) =>
+			(y === 3 && x === 7) || (y === 5 && x === 3) ? 'S' : null
+		)
 	)
 	let randomMinos: Field[][][] = [] // = getRandomMinos()
 	let activeMino: ActiveMino = [] // = getNextActiveMino()
@@ -67,8 +78,7 @@
 		spawnMinoInField()
 	}
 
-	let isStopped = false
-
+	let isStopped = true
 	// 一定間隔で下にずらす
 	const setIntervalId = setInterval(() => {
 		// activeMinoがない時は追加する
@@ -81,8 +91,8 @@
 		if (isFinished) clearInterval(setIntervalId)
 		if (isStopped) return
 
-		// const res = ableToSlideDown()
-		const res = ableToSlideDown(fields, activeMino)
+		// const res = ableToMoveDown()
+		const res = ableToMoveDown(fields, activeMino)
 		// 着地した
 		if (!res) {
 			changeNextMino()
@@ -91,11 +101,61 @@
 		// currentMinoを下にずらす
 		fields = res.fields
 		activeMino = res.activeMino
-	}, 100)
+	}, 1000)
 
-	let code = ''
-	const handleKeydown = (event: any) => {
-		code = event.code
+	const arr = [
+		[1, 2, 3],
+		[4, 5, 6],
+		[7, 8, 9]
+	]
+
+	for (let x = arr.length - 1; x >= 0; x--) {
+		for (let y = 0; y < arr.length; y++) {
+			console.log(arr[y][x])
+		}
+	}
+	console.log(JSON.stringify(arr))
+
+	const handleKeydown = (e: KeyboardEvent) => {
+		if (isFinished) return
+		const code = e.code
+		e.preventDefault() // ブラウザ本来の挙動をさせない
+
+		let res:
+			| false
+			| {
+					fields: any
+					activeMino: any
+			  } = false
+		switch (code) {
+			// 移動
+			case 'ArrowRight':
+				res = ableToMoveRight(fields, activeMino)
+				break
+			case 'ArrowLeft':
+				res = ableToMoveLeft(fields, activeMino)
+				break
+			case 'ArrowDown':
+				res = ableToMoveDown(fields, activeMino)
+				break
+
+			// 回転
+			case 'ArrowUp':
+			case 'KeyX':
+				console.log('右回り')
+				break
+			case 'KeyZ':
+				console.log('左回り')
+				break
+
+			// ハードドロップ
+			case 'Space':
+				console.log('スペース')
+		}
+		if (!!res) {
+			fields = res.fields
+			activeMino = res.activeMino
+		}
 	}
 </script>
 
@@ -120,7 +180,6 @@
 
 <div>
 	<button>左</button>
-	code: {code}
 </div>
 
 <p>current</p>
