@@ -11,10 +11,11 @@
 
 	type Color = 'I' | 'O' | 'S' | 'Z' | 'J' | 'L' | 'T'
 	type Field = null | Color
+	type CurrentMino = { y: number; x: number; value: Field }[][]
+
 	let fields: Field[][] = [...Array(20)].map(() =>
 		[...Array(10)].map(() => null)
 	)
-
 	const minos: Field[][][] = [
 		// I 水色
 		[
@@ -32,7 +33,7 @@
 		[
 			[null, 'S', 'S'],
 			['S', 'S', null],
-			[null, 'S', null]
+			[null, null, null]
 		],
 		// Z 赤
 		[
@@ -59,24 +60,32 @@
 			[null, null, null]
 		]
 	]
-
-	let currentMino: { y: number; x: number; value: Field }[][]
+	let currentMino: CurrentMino
+	let isFinished = false
 
 	// 配列の0~6をランダムの順番にする
 	const getRandomMino = () => {
-		const mino = structuredClone(minos[2])
+		const mino = structuredClone(minos[5])
 		// console.log(JSON.stringify(mino.map((_, y) => _.map((v, x) => ({ y, x, value: v }))),null,2))
 		// ここでxの位置を初期値（左上をx:3,y:0にする）
 		return mino.map((_, y) => _.map((v, x) => ({ y, x: x + 3, value: v })))
 	}
 
-	// currentMinoをフィールドの初期位置にセット
-	const setMinoToFields = () => {
+	// currentMinoをフィールドに出現
+	const spawnMinoInField = () => {
 		for (let iy = 0; iy < currentMino.length; iy++) {
 			const fieldsX = currentMino[iy]
 			for (let ix = 0; ix < fieldsX.length; ix++) {
 				const field = currentMino[iy][ix]
 				const { x, y, value } = field
+
+				if (!value) continue // 値がnullなら無視
+
+				// 置く位置が埋まっていたら終了
+				if (fields[y][x]) {
+					isFinished = true
+					return
+				}
 				fields[y][x] = value
 			}
 		}
@@ -84,45 +93,70 @@
 
 	const changeNextMino = () => {
 		currentMino = getRandomMino()
-		setMinoToFields()
+		spawnMinoInField()
 	}
 
-	// let currentMino: { y: number; x: number; value: Field }[][] = getRandomMino()
 	changeNextMino()
 
-	let isBroken = false
+	// currentMinoを下にずらせるかチェック
+	// const ableToSlideDown = (): false | Field[][] => {
+	const ableToSlideDown = ():
+		| false
+		| { fields: Field[][]; currentMino: CurrentMino } => {
+		let testFields = structuredClone(fields)
+		let testCurrentMino = structuredClone(currentMino)
 
-	// 一定時間後に下にずらす
-	setInterval(() => {
-		// currentMinoの位置をずらす
-		// 後ろからやる（先に地面に着くから）
-
-		// if (isBroken) return
+		// currentMinoを1まとまりで、1つでも無理ならfalse
 		for (let iy = currentMino.length - 1; iy >= 0; iy--) {
 			const fieldsX = currentMino[iy]
 			for (let ix = 0; ix < fieldsX.length; ix++) {
-				const field = currentMino[iy][ix]
-				console.log('ループしてるよ')
-
-				// 一番下に着いた
-				if (field.y >= 19) {
-					console.log('break!', field.y)
-					changeNextMino()
-					// isBroken = true
-					return
+				testCurrentMino[iy][ix].y += 1
+				const field = testCurrentMino[iy][ix]
+				if (!field.value) continue
+				// 一番下に着いた or ミノにぶつかる
+				if (field.y > 19 || testFields[field.y][field.x]) {
+					console.log('break!', field)
+					return false
 				}
 
-				currentMino[iy][ix].y += 1
-				const { x, y, value } = currentMino[iy][ix]
-				fields[y][x] = value // 次の位置に移動
-				fields[y - 1][x] = null // 前の位置をnullに
+				const { x, y, value } = field
+				testFields[y][x] = value // 次の位置に移動
+				testFields[y - 1][x] = null // 前の位置をnullに
 			}
 		}
-		console.log('breakの後に実行')
-	}, 400)
+
+		return { fields: testFields, currentMino: testCurrentMino }
+	}
+
+	let isBroken = true
+	let isStopped = true
+
+	// 一定時間後に下にずらす
+	const setIntervalId = setInterval(() => {
+		if (isFinished) clearInterval(setIntervalId)
+		if (isStopped) return
+
+		const res = ableToSlideDown()
+		if (!res) {
+			changeNextMino()
+			return
+		}
+		// currentMinoを下にずらす
+		fields = res.fields
+		currentMino = res.currentMino
+		// slideDownCurrentMino()
+	}, 50)
 </script>
 
 <h1 class="font-bold text-center text-40px">テトリス</h1>
+
+<button on:click={() => (isStopped = !isStopped)}
+	>{isStopped ? '再開' : '止める'}</button
+>
+
+{#if isFinished === true}
+	<p>終了！</p>
+{/if}
 
 <div class="border border-black border-2 mt-8">
 	{#each fields as field1, y (y)}
@@ -133,7 +167,9 @@
 					class={`border h-7 w-7 ${
 						currentMino.flat().find(pos => pos.x === x && pos.y === y) &&
 						'bg-red-100'
-					} `}
+					} 
+					${field && 'bg-blue-100'} 
+					`}
 				>
 					{field}
 				</div>
