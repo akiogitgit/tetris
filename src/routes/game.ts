@@ -1,14 +1,60 @@
+import { FIELD_HIGHT } from './+page.svelte'
+
 type Color = 'I' | 'O' | 'S' | 'Z' | 'J' | 'L' | 'T'
 type Field = null | Color
 type CurrentMino = { y: number; x: number; value: Field }[][]
 
+// const minos: Field[][][] = [
+// 	// I 水色
+// 	[
+// 		['I', 'I', 'I', 'I'],
+// 		[null, null, null, null],
+// 		[null, null, null, null],
+// 		[null, null, null, null]
+// 	],
+// 	// O 黄色
+// 	[
+// 		['O', 'O'],
+// 		['O', 'O']
+// 	],
+// 	// S 緑
+// 	[
+// 		[null, 'S', 'S'],
+// 		['S', 'S', null],
+// 		[null, null, null]
+// 	],
+// 	// Z 赤
+// 	[
+// 		['Z', 'Z', null],
+// 		[null, 'Z', 'Z'],
+// 		[null, null, null]
+// 	],
+// 	// J 青
+// 	[
+// 		['J', null, null],
+// 		['J', 'J', 'J'],
+// 		[null, null, null]
+// 	],
+// 	// L 青
+// 	[
+// 		[null, null, 'L'],
+// 		['L', 'L', 'L'],
+// 		[null, null, null]
+// 	],
+// 	// T 紫
+// 	[
+// 		[null, 'T', null],
+// 		['T', 'T', 'T'],
+// 		[null, null, null]
+// 	]
+// ]
 const minos: Field[][][] = [
 	// I 水色
 	[
-		['I', 'I', 'I', 'I'],
 		[null, null, null, null],
 		[null, null, null, null],
-		[null, null, null, null]
+		[null, null, null, null],
+		['I', 'I', 'I', 'I']
 	],
 	// O 黄色
 	[
@@ -17,33 +63,33 @@ const minos: Field[][][] = [
 	],
 	// S 緑
 	[
+		[null, null, null],
 		[null, 'S', 'S'],
-		['S', 'S', null],
-		[null, null, null]
+		['S', 'S', null]
 	],
 	// Z 赤
 	[
+		[null, null, null],
 		['Z', 'Z', null],
-		[null, 'Z', 'Z'],
-		[null, null, null]
+		[null, 'Z', 'Z']
 	],
 	// J 青
 	[
+		[null, null, null],
 		['J', null, null],
-		['J', 'J', 'J'],
-		[null, null, null]
+		['J', 'J', 'J']
 	],
 	// L 青
 	[
+		[null, null, null],
 		[null, null, 'L'],
-		['L', 'L', 'L'],
-		[null, null, null]
+		['L', 'L', 'L']
 	],
 	// T 紫
 	[
+		[null, null, null],
 		[null, 'T', null],
-		['T', 'T', 'T'],
-		[null, null, null]
+		['T', 'T', 'T']
 	]
 ]
 
@@ -60,9 +106,14 @@ export const getRandomMinos = () => {
 
 // 次の操作するミノを取得
 export const getNextActiveMino = (nextMino: readonly Field[][]) => {
-	// ここで初期位置をxが中央、y:0にする
+	// ここで初期位置をxが中央、yを一番下が4になるように調整する
 	return nextMino.map((_, y) =>
-		_.map((v, x) => ({ y, x: nextMino.length > 2 ? x + 3 : x + 4, value: v }))
+		// _.map((v, x) => ({ y, x: nextMino.length > 2 ? x + 3 : x + 4, value: v }))
+		_.map((v, x) => ({
+			y: 4 - nextMino.length + y,
+			x: nextMino.length > 2 ? x + 3 : x + 4,
+			value: v
+		}))
 	)
 }
 
@@ -112,7 +163,7 @@ export const ableToSlideDown = (
 			if (!field.value) continue // nullは無視
 
 			// 一番下に着いた or ミノにぶつかる
-			if (field.y > 19 || testFields[field.y][field.x]) {
+			if (field.y > FIELD_HIGHT - 1 || testFields[field.y][field.x]) {
 				console.log('break!', field)
 				return false
 			}

@@ -1,3 +1,8 @@
+<script lang="ts" context="module">
+	export const FIELD_HIGHT = 23
+	export const FIELD_WIDTH = 10
+</script>
+
 <script lang="ts">
 	import { ableToSlideDown, getNextActiveMino, getRandomMinos } from './game'
 
@@ -15,8 +20,8 @@
 	type Field = null | Color
 	type ActiveMino = { y: number; x: number; value: Field }[][]
 
-	let fields: Field[][] = [...Array(20)].map(() =>
-		[...Array(10)].map(() => null)
+	let fields: Field[][] = [...Array(FIELD_HIGHT)].map(() =>
+		[...Array(FIELD_WIDTH)].map(() => null)
 	)
 	let randomMinos: Field[][][] = [] // = getRandomMinos()
 	let activeMino: ActiveMino = [] // = getNextActiveMino()
@@ -24,7 +29,12 @@
 	let isFinished = false
 
 	// currentMinoをフィールドに出現
+	// ミノの下(nullじゃない)がフィールドの一番上に来るようにしたい
+	// minosをnullが下にならないように、fieldsの高さ増やす
+	// getNextActiveMinoのyの位置変更
+	// 終了判定はここだけでOK
 	const spawnMinoInField = () => {
+		const testFileds: Field[][] = structuredClone(fields)
 		for (let iy = 0; iy < activeMino.length; iy++) {
 			const fieldsX = activeMino[iy]
 			for (let ix = 0; ix < fieldsX.length; ix++) {
@@ -33,14 +43,16 @@
 
 				if (!value) continue // 値がnullなら無視
 
-				// 置く位置が埋まっていたら終了
-				if (fields[y][x]) {
+				// 一部分でもミノの置く位置が埋まっていたら終了
+				if (testFileds[y][x]) {
 					isFinished = true
 					return
 				}
-				fields[y][x] = value
+				testFileds[y][x] = value
 			}
 		}
+		// ミノ全体を置ければ置く
+		fields = testFileds
 	}
 
 	const changeNextMino = () => {
@@ -95,9 +107,13 @@
 
 <div class="flex gap-3 items-start">
 	<!-- フィールド -->
-	<div class="border border-black border-2 mt-8">
+	<div class="border-black border-2 mt-8">
 		{#each fields as field1, y (y)}
-			<div class="flex">
+			<div
+				class={`${y < 3 && 'bg-gray-100'} ${
+					y === 2 && 'border-b-2 border-black'
+				} flex`}
+			>
 				{#each field1 as field, x (x)}
 					<div
 						class={`border h-7 w-7 ${
@@ -107,7 +123,7 @@
 					${field && 'bg-blue-100'} 
 					`}
 					>
-						{field}
+						{field ? field : ''}
 					</div>
 				{/each}
 			</div>
@@ -117,12 +133,11 @@
 	<div>
 		{#each randomMinos as field1, y (y)}
 			<div class="mt-4">
-				{y}
 				{#each field1 as field2, x (x)}
 					<div class="flex">
 						{#each field2 as field, x (x)}
 							<div class={`border h-7 w-7 ${field && 'bg-blue-100'}`}>
-								{field}
+								{field ? field : ''}
 							</div>
 						{/each}
 					</div>
