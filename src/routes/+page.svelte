@@ -1,9 +1,15 @@
 <script lang="ts" context="module">
 	export const FIELD_HIGHT = 23
 	export const FIELD_WIDTH = 10
+
+	export type Color = 'I' | 'O' | 'S' | 'Z' | 'J' | 'L' | 'T'
+	export type Field = null | Color
+	export type ActiveMino = { y: number; x: number; value: Field }[][]
 </script>
 
 <script lang="ts">
+	import Fields from '../components/Fields.svelte'
+	import NextMino from '../components/NextMino.svelte'
 	import { ableToSlideDown, getNextActiveMino, getRandomMinos } from './game'
 
 	// ルール
@@ -16,10 +22,6 @@
 
 	// 各ミノは4*4, 5*5で持っとくといいか？回転を考えると
 
-	type Color = 'I' | 'O' | 'S' | 'Z' | 'J' | 'L' | 'T'
-	type Field = null | Color
-	type ActiveMino = { y: number; x: number; value: Field }[][]
-
 	let fields: Field[][] = [...Array(FIELD_HIGHT)].map(() =>
 		[...Array(FIELD_WIDTH)].map(() => null)
 	)
@@ -29,9 +31,6 @@
 	let isFinished = false
 
 	// currentMinoをフィールドに出現
-	// ミノの下(nullじゃない)がフィールドの一番上に来るようにしたい
-	// minosをnullが下にならないように、fieldsの高さ増やす
-	// getNextActiveMinoのyの位置変更
 	// 終了判定はここだけでOK
 	const spawnMinoInField = () => {
 		const testFileds: Field[][] = structuredClone(fields)
@@ -93,6 +92,11 @@
 		fields = res.fields
 		activeMino = res.activeMino
 	}, 100)
+
+	let code = ''
+	const handleKeydown = (event: any) => {
+		code = event.code
+	}
 </script>
 
 <h1 class="font-bold text-center text-40px">テトリス</h1>
@@ -105,46 +109,18 @@
 	<p>終了！</p>
 {/if}
 
-<div class="flex gap-3 items-start">
+<div class="flex mt-8 gap-3 items-start">
 	<!-- フィールド -->
-	<div class="border-black border-2 mt-8">
-		{#each fields as field1, y (y)}
-			<div
-				class={`${y < 3 && 'bg-gray-100'} ${
-					y === 2 && 'border-b-2 border-black'
-				} flex`}
-			>
-				{#each field1 as field, x (x)}
-					<div
-						class={`border h-7 w-7 ${
-							activeMino.flat().find(pos => pos.x === x && pos.y === y) &&
-							'bg-red-100'
-						} 
-					${field && 'bg-blue-100'} 
-					`}
-					>
-						{field ? field : ''}
-					</div>
-				{/each}
-			</div>
-		{/each}
-	</div>
+	<Fields {fields} {activeMino} />
+	<NextMino {randomMinos} />
+</div>
 
-	<div>
-		{#each randomMinos as field1, y (y)}
-			<div class="mt-4">
-				{#each field1 as field2, x (x)}
-					<div class="flex">
-						{#each field2 as field, x (x)}
-							<div class={`border h-7 w-7 ${field && 'bg-blue-100'}`}>
-								{field ? field : ''}
-							</div>
-						{/each}
-					</div>
-				{/each}
-			</div>
-		{/each}
-	</div>
+<!-- ボタン、キーボード操作 -->
+<svelte:window on:keydown={handleKeydown} />
+
+<div>
+	<button>左</button>
+	code: {code}
 </div>
 
 <p>current</p>
