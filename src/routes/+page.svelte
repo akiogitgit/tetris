@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { beforeUpdate, onMount } from 'svelte'
+
 	// ルール
 	// 20 * 10
 	// ミノは7種類でワールドルール
@@ -60,15 +62,36 @@
 			[null, null, null]
 		]
 	]
-	let currentMino: CurrentMino
+	let randomMinos: Field[][][] = getRandomMinos()
+	let currentMino: CurrentMino = getNextMino()
+
 	let isFinished = false
 
 	// 配列の0~6をランダムの順番にする
-	const getRandomMino = () => {
-		const mino = structuredClone(minos[5])
-		// console.log(JSON.stringify(mino.map((_, y) => _.map((v, x) => ({ y, x, value: v }))),null,2))
-		// ここでxの位置を初期値（左上をx:3,y:0にする）
-		return mino.map((_, y) => _.map((v, x) => ({ y, x: x + 3, value: v })))
+	function getRandomMinos() {
+		// 0~6の数字を配列をランダムに並び替え
+		const numbers = Array.from({ length: 7 }, (_, index) => index)
+		const shuffledNumbers = numbers.sort(() => Math.random() - 0.5)
+
+		// ランダムな順番のミノ一式
+		const shuffledMinos: Field[][][] = shuffledNumbers.map(v => minos[v])
+
+		return shuffledMinos
+	}
+	function getNextMino() {
+		// randomMinosが減ってきたら、後ろに補充
+		if (randomMinos.length <= 2) {
+			randomMinos = [...randomMinos, ...getRandomMinos()]
+		}
+
+		const [nextMino, ...v] = randomMinos
+		const mino = nextMino // randomMinos[0]
+		randomMinos = v // randomMinos[0]以外
+
+		// ここで初期位置をxが中央、y:0にする
+		return mino.map((_, y) =>
+			_.map((v, x) => ({ y, x: mino.length > 2 ? x + 3 : x + 4, value: v }))
+		)
 	}
 
 	// currentMinoをフィールドに出現
@@ -92,14 +115,12 @@
 	}
 
 	const changeNextMino = () => {
-		currentMino = getRandomMino()
+		currentMino = getNextMino()
 		spawnMinoInField()
 	}
 
-	changeNextMino()
-
 	// currentMinoを下にずらせるかチェック
-	// const ableToSlideDown = (): false | Field[][] => {
+	// ずらせるなら、ずらした後のfields, currentMinoを返す
 	const ableToSlideDown = ():
 		| false
 		| { fields: Field[][]; currentMino: CurrentMino } => {
@@ -112,6 +133,7 @@
 			for (let ix = 0; ix < fieldsX.length; ix++) {
 				testCurrentMino[iy][ix].y += 1
 				const field = testCurrentMino[iy][ix]
+
 				if (!field.value) continue
 				// 一番下に着いた or ミノにぶつかる
 				if (field.y > 19 || testFields[field.y][field.x]) {
@@ -128,15 +150,16 @@
 		return { fields: testFields, currentMino: testCurrentMino }
 	}
 
-	let isBroken = true
-	let isStopped = true
+	let isStopped = false
 
-	// 一定時間後に下にずらす
+	// 一定間隔で下にずらす
 	const setIntervalId = setInterval(() => {
 		if (isFinished) clearInterval(setIntervalId)
 		if (isStopped) return
+		if (!currentMino?.length) return
 
 		const res = ableToSlideDown()
+		// 着地した
 		if (!res) {
 			changeNextMino()
 			return
@@ -144,8 +167,7 @@
 		// currentMinoを下にずらす
 		fields = res.fields
 		currentMino = res.currentMino
-		// slideDownCurrentMino()
-	}, 50)
+	}, 100)
 </script>
 
 <h1 class="font-bold text-center text-40px">テトリス</h1>
@@ -158,40 +180,48 @@
 	<p>終了！</p>
 {/if}
 
-<div class="border border-black border-2 mt-8">
-	{#each fields as field1, y (y)}
-		<div class="flex">
-			{#each field1 as field, x (x)}
-				<!-- <div class="border h-7 w-7">{field}</div> -->
-				<div
-					class={`border h-7 w-7 ${
-						currentMino.flat().find(pos => pos.x === x && pos.y === y) &&
-						'bg-red-100'
-					} 
+<div class="flex gap-3 items-start">
+	<!-- フィールド -->
+	<div class="border border-black border-2 mt-8">
+		{#each fields as field1, y (y)}
+			<div class="flex">
+				{#each field1 as field, x (x)}
+					<div
+						class={`border h-7 w-7 ${
+							currentMino.flat().find(pos => pos.x === x && pos.y === y) &&
+							'bg-red-100'
+						} 
 					${field && 'bg-blue-100'} 
 					`}
-				>
-					{field}
-				</div>
-			{/each}
-		</div>
-	{/each}
+					>
+						{field}
+					</div>
+				{/each}
+			</div>
+		{/each}
+	</div>
+
+	<div>
+		{#each randomMinos as field1, y (y)}
+			<div class="mt-4">
+				{y}
+				{#each field1 as field2, x (x)}
+					<div class="flex">
+						{#each field2 as field, x (x)}
+							<div class={`border h-7 w-7 ${field && 'bg-blue-100'}`}>
+								{field}
+							</div>
+						{/each}
+					</div>
+				{/each}
+			</div>
+		{/each}
+	</div>
 </div>
 
 <p>current</p>
 <div>
 	{#each currentMino as field1, y (y)}
-		<div class="flex">
-			{#each field1 as field, x (x)}
-				<div class="border h-7">{JSON.stringify(field)}</div>
-			{/each}
-		</div>
-	{/each}
-</div>
-
-<p>minos[2]</p>
-<div>
-	{#each minos[2] as field1, y (y)}
 		<div class="flex">
 			{#each field1 as field, x (x)}
 				<div class="border h-7">{JSON.stringify(field)}</div>
