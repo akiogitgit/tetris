@@ -10,15 +10,8 @@
 <script lang="ts">
 	import Fields from '../components/Fields.svelte'
 	import NextMino from '../components/NextMino.svelte'
-	import {
-		ableToMoveRight,
-		ableToMoveDown,
-		getNextActiveMino,
-		getRandomMinos,
-		ableToMoveLeft,
-		ableToRotateRight,
-		ableToRotateLeft
-	} from './game'
+	import { ableToMoveDown, getNextActiveMino, getRandomMinos } from './game'
+	import ControlPanel from '../components/ControlPanel.svelte'
 
 	// ルール
 	// 20 * 10
@@ -36,14 +29,10 @@
 	// ミノを消す度レベルが上がり、落下速度が上がる
 
 	let fields: Field[][] = [...Array(FIELD_HIGHT)].map((_, y) =>
-		[...Array(FIELD_WIDTH)].map(
-			(_, x) =>
-				// (y === 3 && x === 7) || (y === 5 && x === 1) ? 'S' : null
-				null
-		)
+		[...Array(FIELD_WIDTH)].map(() => null)
 	)
-	let randomMinos: Field[][][] = [] // = getRandomMinos()
-	let activeMino: ActiveMino = [] // = getNextActiveMino()
+	let randomMinos: Field[][][] = []
+	let activeMino: ActiveMino = []
 
 	let isFinished = false
 
@@ -109,71 +98,10 @@
 		activeMino = res.activeMino
 	}, 1000)
 
-	const handleKeydown = (e: KeyboardEvent) => {
-		// const handleKeydown = (e: {code:"string"}) => {
-		if (isFinished) return
-		const code = e.code
-		e.preventDefault() // ブラウザ本来の挙動をさせない
-
-		let res:
-			| false
-			| {
-					fields: any
-					activeMino: any
-			  } = false
-		switch (code) {
-			// 移動
-			case 'ArrowRight':
-				res = ableToMoveRight(fields, activeMino)
-				break
-			case 'ArrowLeft':
-				res = ableToMoveLeft(fields, activeMino)
-				break
-			case 'ArrowDown':
-				res = ableToMoveDown(fields, activeMino)
-				break
-
-			// 回転
-			case 'ArrowUp':
-			case 'KeyX':
-				res = ableToRotateRight(fields, activeMino)
-				break
-			case 'KeyZ':
-				console.log('左回り')
-				res = ableToRotateLeft(fields, activeMino)
-				break
-
-			// ハードドロップ
-			case 'Space':
-				console.log('スペース')
-		}
-		if (!!res) {
-			// console.log('res.active', JSON.stringify(res.activeMino))
-			fields = res.fields
-			activeMino = res.activeMino
-			// console.log('active', JSON.stringify(activeMino))
-		}
+	const onMoveMino = (v: { fields: Field[][]; activeMino: ActiveMino }) => {
+		fields = v.fields
+		activeMino = v.activeMino
 	}
-
-	const array = [
-		[1, 2, 3],
-		[4, 5, 6],
-		[7, 8, 9]
-	]
-
-	const length = array.length
-
-	const rotatedArray: number[][] = Array.from({ length: length }, () => [])
-
-	for (let x = 0; x < length; x++) {
-		for (let y = 0; y < length; y++) {
-			const newX = y
-			const newY = length - 1 - x
-			rotatedArray[newX][newY] = array[x][y]
-		}
-	}
-
-	console.log(rotatedArray)
 </script>
 
 <h1 class="font-bold text-center text-40px">テトリス</h1>
@@ -189,17 +117,14 @@
 <div class="flex mt-8 gap-3 items-start">
 	<!-- フィールド -->
 	<Fields {fields} {activeMino} />
-	<NextMino {randomMinos} />
+
+	<div class="flex flex-col gap-3">
+		<NextMino {randomMinos} />
+		<ControlPanel {fields} {activeMino} {isFinished} {onMoveMino} />
+	</div>
 </div>
 
-<!-- ボタン、キーボード操作 -->
-<svelte:window on:keydown={handleKeydown} />
-
-<div>
-	<button>左</button>
-</div>
-
-<p>active</p>
+<!-- <p>active</p>
 <div>
 	{#each activeMino as field2, x (x)}
 		<div class="flex">
@@ -210,4 +135,4 @@
 			{/each}
 		</div>
 	{/each}
-</div>
+</div> -->
