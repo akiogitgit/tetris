@@ -16,7 +16,8 @@
 		getNextActiveMino,
 		getRandomMinos,
 		ableToMoveLeft,
-		ableToRotateRight
+		ableToRotateRight,
+		ableToRotateLeft
 	} from './game'
 
 	// ルール
@@ -137,6 +138,7 @@
 				break
 			case 'KeyZ':
 				console.log('左回り')
+				res = ableToRotateLeft(fields, activeMino)
 				break
 
 			// ハードドロップ
