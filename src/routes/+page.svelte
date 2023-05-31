@@ -28,11 +28,13 @@
 	// 左右に移動、90度回転
 	// ハードドロップ
 
-	// 各ミノは4*4, 5*5で持っとくといいか？回転を考えると
+	// 色付ける
+	// ボタン付ける
+	// ミノを消す
+	// ハードドロップ、ゴーストブロック
+	// 落下速度は初期値0.8s
+	// ミノを消す度レベルが上がり、落下速度が上がる
 
-	// let fields: Field[][] = [...Array(FIELD_HIGHT)].map(() =>
-	// 	[...Array(FIELD_WIDTH)].map(() => null)
-	// )
 	let fields: Field[][] = [...Array(FIELD_HIGHT)].map((_, y) =>
 		[...Array(FIELD_WIDTH)].map(
 			(_, x) =>
