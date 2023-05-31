@@ -15,7 +15,8 @@
 		ableToMoveDown,
 		getNextActiveMino,
 		getRandomMinos,
-		ableToMoveLeft
+		ableToMoveLeft,
+		ableToRotateRight
 	} from './game'
 
 	// ルール
@@ -32,8 +33,10 @@
 	// 	[...Array(FIELD_WIDTH)].map(() => null)
 	// )
 	let fields: Field[][] = [...Array(FIELD_HIGHT)].map((_, y) =>
-		[...Array(FIELD_WIDTH)].map((_, x) =>
-			(y === 3 && x === 7) || (y === 5 && x === 3) ? 'S' : null
+		[...Array(FIELD_WIDTH)].map(
+			(_, x) =>
+				// (y === 3 && x === 7) || (y === 5 && x === 1) ? 'S' : null
+				null
 		)
 	)
 	let randomMinos: Field[][][] = [] // = getRandomMinos()
@@ -78,7 +81,7 @@
 		spawnMinoInField()
 	}
 
-	let isStopped = true
+	let isStopped = false
 	// 一定間隔で下にずらす
 	const setIntervalId = setInterval(() => {
 		// activeMinoがない時は追加する
@@ -103,20 +106,8 @@
 		activeMino = res.activeMino
 	}, 1000)
 
-	const arr = [
-		[1, 2, 3],
-		[4, 5, 6],
-		[7, 8, 9]
-	]
-
-	for (let x = arr.length - 1; x >= 0; x--) {
-		for (let y = 0; y < arr.length; y++) {
-			console.log(arr[y][x])
-		}
-	}
-	console.log(JSON.stringify(arr))
-
 	const handleKeydown = (e: KeyboardEvent) => {
+		// const handleKeydown = (e: {code:"string"}) => {
 		if (isFinished) return
 		const code = e.code
 		e.preventDefault() // ブラウザ本来の挙動をさせない
@@ -142,7 +133,7 @@
 			// 回転
 			case 'ArrowUp':
 			case 'KeyX':
-				console.log('右回り')
+				res = ableToRotateRight(fields, activeMino)
 				break
 			case 'KeyZ':
 				console.log('左回り')
@@ -153,10 +144,32 @@
 				console.log('スペース')
 		}
 		if (!!res) {
+			// console.log('res.active', JSON.stringify(res.activeMino))
 			fields = res.fields
 			activeMino = res.activeMino
+			// console.log('active', JSON.stringify(activeMino))
 		}
 	}
+
+	const array = [
+		[1, 2, 3],
+		[4, 5, 6],
+		[7, 8, 9]
+	]
+
+	const length = array.length
+
+	const rotatedArray: number[][] = Array.from({ length: length }, () => [])
+
+	for (let x = 0; x < length; x++) {
+		for (let y = 0; y < length; y++) {
+			const newX = y
+			const newY = length - 1 - x
+			rotatedArray[newX][newY] = array[x][y]
+		}
+	}
+
+	console.log(rotatedArray)
 </script>
 
 <h1 class="font-bold text-center text-40px">テトリス</h1>
@@ -182,12 +195,14 @@
 	<button>左</button>
 </div>
 
-<p>current</p>
+<p>active</p>
 <div>
-	{#each activeMino as field1, y (y)}
+	{#each activeMino as field2, x (x)}
 		<div class="flex">
-			{#each field1 as field, x (x)}
-				<div class="border h-7">{JSON.stringify(field)}</div>
+			{#each field2 as field, x (x)}
+				<div class={`border h-7 w-7 ${field.value && 'bg-blue-100'}`}>
+					{field.x}{field.y}
+				</div>
 			{/each}
 		</div>
 	{/each}

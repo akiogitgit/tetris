@@ -4,92 +4,50 @@ type Color = 'I' | 'O' | 'S' | 'Z' | 'J' | 'L' | 'T'
 type Field = null | Color
 type CurrentMino = { y: number; x: number; value: Field }[][]
 
-// const minos: Field[][][] = [
-// 	// I 水色
-// 	[
-// 		['I', 'I', 'I', 'I'],
-// 		[null, null, null, null],
-// 		[null, null, null, null],
-// 		[null, null, null, null]
-// 	],
-// 	// O 黄色
-// 	[
-// 		['O', 'O'],
-// 		['O', 'O']
-// 	],
-// 	// S 緑
-// 	[
-// 		[null, 'S', 'S'],
-// 		['S', 'S', null],
-// 		[null, null, null]
-// 	],
-// 	// Z 赤
-// 	[
-// 		['Z', 'Z', null],
-// 		[null, 'Z', 'Z'],
-// 		[null, null, null]
-// 	],
-// 	// J 青
-// 	[
-// 		['J', null, null],
-// 		['J', 'J', 'J'],
-// 		[null, null, null]
-// 	],
-// 	// L 青
-// 	[
-// 		[null, null, 'L'],
-// 		['L', 'L', 'L'],
-// 		[null, null, null]
-// 	],
-// 	// T 紫
-// 	[
-// 		[null, 'T', null],
-// 		['T', 'T', 'T'],
-// 		[null, null, null]
-// 	]
-// ]
 const minos: Field[][][] = [
 	// I 水色
 	[
 		[null, null, null, null],
 		[null, null, null, null],
-		[null, null, null, null],
-		['I', 'I', 'I', 'I']
+		['I', 'I', 'I', 'I'],
+		[null, null, null, null]
 	],
 	// O 黄色
 	[
-		['O', 'O'],
-		['O', 'O']
+		[null, null, null, null],
+		[null, 'O', 'O', null],
+		[null, 'O', 'O', null],
+		[null, null, null, null]
 	],
 	// S 緑
 	[
-		[null, null, null],
 		[null, 'S', 'S'],
-		['S', 'S', null]
+		['S', 'S', null],
+		[null, null, null]
 	],
 	// Z 赤
 	[
-		[null, null, null],
 		['Z', 'Z', null],
-		[null, 'Z', 'Z']
+		[null, 'Z', 'Z'],
+		[null, null, null]
 	],
 	// J 青
 	[
-		[null, null, null],
 		['J', null, null],
-		['J', 'J', 'J']
+		['J', 'J', 'J'],
+		[null, null, null]
 	],
 	// L 青
 	[
-		[null, null, null],
 		[null, null, 'L'],
-		['L', 'L', 'L']
+		['L', 'L', 'L'],
+		[null, null, null]
 	],
 	// T 紫
 	[
-		[null, null, null],
 		[null, 'T', null],
-		['T', 'T', 'T']
+		['T', 'T', 'T'],
+		[null, null, null]
 	]
 ]
 
@@ -117,30 +75,6 @@ export const getNextActiveMino = (nextMino: readonly Field[][]) => {
 	)
 }
 
-// currentMinoをフィールドに出現
-const spawnMinoInField = (
-	activeMino: CurrentMino,
-	fields: Field[][],
-	isFinished: boolean
-) => {
-	for (let iy = 0; iy < activeMino.length; iy++) {
-		const fieldsX = activeMino[iy]
-		for (let ix = 0; ix < fieldsX.length; ix++) {
-			const field = activeMino[iy][ix]
-			const { x, y, value } = field
-
-			if (!value) continue // 値がnullなら無視
-
-			// 置く位置が埋まっていたら終了
-			if (fields[y][x]) {
-				isFinished = true
-				return
-			}
-			fields[y][x] = value
-		}
-	}
-}
-
 // currentMinoを下にずらせるかチェック
 // ずらせるなら、ずらした後のfields, currentMinoを返す
 export const ableToMoveDown = (
@@ -149,7 +83,7 @@ export const ableToMoveDown = (
 ): false | { fields: Field[][]; activeMino: CurrentMino } => {
 	// 引数の配列をコピー
 	const testFields = structuredClone(fields)
-	const testCurrentMino = structuredClone(activeMino)
+	const testActiveMino = structuredClone(activeMino)
 
 	// currentMinoを1まとまりで、1つでも無理ならfalse
 	for (let iy = activeMino.length - 1; iy >= 0; iy--) {
@@ -157,14 +91,13 @@ export const ableToMoveDown = (
 
 		for (let ix = 0; ix < fieldsX.length; ix++) {
 			// 下にずらす
-			testCurrentMino[iy][ix].y += 1
-			const field = testCurrentMino[iy][ix]
+			testActiveMino[iy][ix].y += 1
+			const field = testActiveMino[iy][ix]
 
-			if (!field.value) continue // nullは無視
+			if (!field.value) continue // 操作するミノのnullは無視
 
 			// 一番下に着いた or ミノにぶつかる
 			if (field.y > FIELD_HIGHT - 1 || testFields[field.y][field.x]) {
-				console.log('break!', field)
 				return false
 			}
 
@@ -174,12 +107,12 @@ export const ableToMoveDown = (
 		}
 	}
 
-	return { fields: testFields, activeMino: testCurrentMino }
+	return { fields: testFields, activeMino: testActiveMino }
 }
 
 export const ableToMoveRight = (fields: Field[][], activeMino: CurrentMino) => {
 	const testFields = structuredClone(fields)
-	const testCurrentMino = structuredClone(activeMino)
+	const testActiveMino = structuredClone(activeMino)
 
 	// currentMinoを1まとまりで、1つでも無理ならfalse
 	for (let ix = activeMino.length - 1; ix >= 0; ix--) {
@@ -187,15 +120,13 @@ export const ableToMoveRight = (fields: Field[][], activeMino: CurrentMino) => {
 
 		for (let iy = 0; iy < fieldsX.length; iy++) {
 			// 下にずらす
-			testCurrentMino[iy][ix].x += 1
-			const field = testCurrentMino[iy][ix]
-			console.log(iy, ix, field)
+			testActiveMino[iy][ix].x += 1
+			const field = testActiveMino[iy][ix]
 
-			if (!field.value) continue // nullは無視
+			if (!field.value) continue // 操作するミノのnullは無視
 
 			// 一番下に着いた or ミノにぶつかる
 			if (field.x > FIELD_WIDTH - 1 || testFields[field.y][field.x]) {
-				console.log('break!', field)
 				return false
 			}
 
@@ -205,12 +136,12 @@ export const ableToMoveRight = (fields: Field[][], activeMino: CurrentMino) => {
 		}
 	}
 
-	return { fields: testFields, activeMino: testCurrentMino }
+	return { fields: testFields, activeMino: testActiveMino }
 }
 
 export const ableToMoveLeft = (fields: Field[][], activeMino: CurrentMino) => {
 	const testFields = structuredClone(fields)
-	const testCurrentMino = structuredClone(activeMino)
+	const testActiveMino = structuredClone(activeMino)
 
 	// currentMinoを1まとまりで、1つでも無理ならfalse
 	for (let iy = 0; iy < activeMino.length; iy++) {
@@ -218,15 +149,13 @@ export const ableToMoveLeft = (fields: Field[][], activeMino: CurrentMino) => {
 
 		for (let ix = 0; ix < fieldsX.length; ix++) {
 			// 下にずらす
-			testCurrentMino[iy][ix].x -= 1
-			const field = testCurrentMino[iy][ix]
-			console.log(iy, ix, field)
+			testActiveMino[iy][ix].x -= 1
+			const field = testActiveMino[iy][ix]
 
-			if (!field.value) continue // nullは無視
+			if (!field.value) continue // 操作するミノのnullは無視
 
 			// 一番下に着いた or ミノにぶつかる
 			if (field.x < 0 || testFields[field.y][field.x]) {
-				console.log('break!', field)
 				return false
 			}
 
@@ -236,5 +165,97 @@ export const ableToMoveLeft = (fields: Field[][], activeMino: CurrentMino) => {
 		}
 	}
 
-	return { fields: testFields, activeMino: testCurrentMino }
+	return { fields: testFields, activeMino: testActiveMino }
+}
+
+export const ableToRotateRight = (
+	fields: Field[][],
+	activeMino: CurrentMino
+) => {
+	const testFields = structuredClone(fields)
+	const testActiveMino = structuredClone(activeMino)
+	const length = testActiveMino.length
+
+	// currentMinoを1まとまりで、1つでも無理ならfalse
+	for (let iy = 0; iy < activeMino.length; iy++) {
+		const fieldsX = activeMino[iy]
+
+		for (let ix = 0; ix < fieldsX.length; ix++) {
+			const beforeMinoY = iy
+			const beforeMinoX = ix
+			const afterMinoY = ix
+			const afterMinoX = length - 1 - iy
+
+			// if文でチェックするミノをactiveMino, fieldsにする
+			const { y: beforeFieldY, x: beforeFieldX } =
+				activeMino[beforeMinoY][beforeMinoX]
+			const { y: afterFieldY, x: afterFieldX } =
+				activeMino[afterMinoY][afterMinoX]
+
+			// 左にはみ出る
+			if (
+				beforeFieldY >= 23 ||
+				beforeFieldX < 0 ||
+				beforeFieldX >= 10 ||
+				afterFieldY >= 23 ||
+				afterFieldX < 0 ||
+				afterFieldX >= 10
+			) {
+				console.log(
+					'無理だ！',
+					{ beforeMinoY },
+					{ beforeMinoX },
+					activeMino[beforeMinoY][beforeMinoX]
+				)
+				return false
+			}
+
+			// 回転前のミノがあって、回転後のミノの空の位置が、fieldsで埋まってたら ダメ
+			// after両方埋まる場合は、activeMinoの場所だから回せる
+			if (
+				activeMino[beforeMinoY][beforeMinoX].value &&
+				!activeMino[afterMinoY][afterMinoX].value &&
+				fields[afterFieldY][afterFieldX]
+			) {
+				console.log(
+					'無理だ！',
+					{ beforeMinoY },
+					{ beforeMinoX },
+					activeMino[beforeMinoY][beforeMinoX]
+				)
+				return false
+			}
+
+			// 違うミノ持ってかれないように
+			// 回転前のミノの空の位置が、回転後の埋まっていないミノの位置で、回転後のfieldsが埋まってたら無視
+			if (
+				!activeMino[beforeMinoY][beforeMinoX].value &&
+				!activeMino[afterMinoY][afterMinoX].value &&
+				fields[afterFieldY][afterFieldX]
+			) {
+				console.log('むし1', { beforeMinoY }, { beforeMinoX })
+				continue
+			}
+
+			// 回転前のミノの空の位置が、fieldsが埋まってたら、afterにnullを代入
+			if (
+				!activeMino[beforeMinoY][beforeMinoX].value &&
+				fields[beforeFieldY][beforeFieldX]
+			) {
+				console.log('afterにnull代入', { beforeMinoY }, { beforeMinoX })
+				testActiveMino[afterMinoY][afterMinoX].value = null
+				testFields[afterFieldY][afterFieldX] = null
+				continue
+			}
+
+			testActiveMino[afterMinoY][afterMinoX].value =
+				activeMino[beforeMinoY][beforeMinoX].value
+			testFields[afterFieldY][afterFieldX] = fields[beforeFieldY][beforeFieldX]
+		}
+	}
+
+	// OK 前回の位置消える！
+	// OK activeMinoの位置
+	// activeMinoを .y = afterYするんじゃなくて、valueだけ入れ替える
+	return { fields: testFields, activeMino: testActiveMino }
 }
