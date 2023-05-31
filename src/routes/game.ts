@@ -78,7 +78,7 @@ export const getNextActiveMino = (nextMino: Field[][]) => {
 
 // activeMinoを下にずらせるかチェック
 // ずらせるなら、ずらした後のfields, activeMinoを返す
-export const ableToMoveDown = (
+export const ableToSlideDown = (
 	fields: Field[][],
 	activeMino: ActiveMino
 ): false | { fields: Field[][]; activeMino: ActiveMino } => {
@@ -111,7 +111,7 @@ export const ableToMoveDown = (
 	return { fields: testFields, activeMino: testActiveMino }
 }
 
-export const ableToMoveRight = (fields: Field[][], activeMino: ActiveMino) => {
+export const ableToSlideRight = (fields: Field[][], activeMino: ActiveMino) => {
 	const testFields = structuredClone(fields)
 	const testActiveMino = structuredClone(activeMino)
 
@@ -140,7 +140,7 @@ export const ableToMoveRight = (fields: Field[][], activeMino: ActiveMino) => {
 	return { fields: testFields, activeMino: testActiveMino }
 }
 
-export const ableToMoveLeft = (fields: Field[][], activeMino: ActiveMino) => {
+export const ableToSlideLeft = (fields: Field[][], activeMino: ActiveMino) => {
 	const testFields = structuredClone(fields)
 	const testActiveMino = structuredClone(activeMino)
 
@@ -258,4 +258,36 @@ export const ableToRotateRight = (
 
 export const ableToRotateLeft = (fields: Field[][], activeMino: ActiveMino) => {
 	return ableToRotate(fields, activeMino, 'left')
+}
+
+export const ableToDeleteLine = (
+	fields: Field[][],
+	activeMino: ActiveMino
+): false | Field[][] => {
+	const testFields = structuredClone(fields)
+	let deleteLineCount = 0
+	const activeMinoY = activeMino[0][0].y // activeMinoの左上のマスの高さ
+
+	const nullLine: Field[] = [...Array(FIELD_WIDTH)].map(() => null)
+
+	// activeMinoの高さの行を一列ずつ全て埋まっているか確認
+	for (let iy = activeMinoY; iy < activeMinoY + activeMino.length; iy++) {
+		if (iy >= FIELD_HIGHT) break
+
+		for (let ix = 0; ix < FIELD_WIDTH; ix++) {
+			if (ix < 0 || ix >= FIELD_WIDTH) continue
+
+			const field = fields[iy][ix]
+			if (!field) break // 空ならこの行は消せない
+
+			// このiyの行が全て埋まっている
+			if (ix === FIELD_WIDTH - 1) {
+				deleteLineCount++
+				testFields[iy] = [...nullLine] // testFieldsのiyの行を消す
+			}
+		}
+	}
+
+	if (deleteLineCount) return testFields
+	return false
 }

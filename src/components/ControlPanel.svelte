@@ -1,8 +1,8 @@
 <script lang="ts">
 	import {
-		ableToMoveRight,
-		ableToMoveDown,
-		ableToMoveLeft,
+		ableToSlideRight,
+		ableToSlideDown,
+		ableToSlideLeft,
 		ableToRotateRight,
 		ableToRotateLeft
 	} from '../routes/game'
@@ -36,13 +36,13 @@
 		switch (code) {
 			// 移動
 			case 'ArrowRight':
-				res = ableToMoveRight(fields, activeMino)
+				res = ableToSlideRight(fields, activeMino)
 				break
 			case 'ArrowLeft':
-				res = ableToMoveLeft(fields, activeMino)
+				res = ableToSlideLeft(fields, activeMino)
 				break
 			case 'ArrowDown':
-				res = ableToMoveDown(fields, activeMino)
+				res = ableToSlideDown(fields, activeMino)
 				break
 
 			// 回転
@@ -51,7 +51,6 @@
 				res = ableToRotateRight(fields, activeMino)
 				break
 			case 'KeyZ':
-				console.log('左回り')
 				res = ableToRotateLeft(fields, activeMino)
 				break
 
@@ -100,7 +99,7 @@
 	</div>
 
 	<div>
-		<button on:click={onClickMoveButton(ableToMoveLeft)}>
+		<button on:click={onClickMoveButton(ableToSlideLeft)}>
 			<Icon
 				icon={IconArrowLeft}
 				height={40}
@@ -109,7 +108,7 @@
 			/>
 		</button>
 
-		<button on:click={onClickMoveButton(ableToMoveDown)}>
+		<button on:click={onClickMoveButton(ableToSlideDown)}>
 			<Icon
 				icon={IconArrowDown}
 				height={40}
@@ -117,7 +116,7 @@
 				class="border-black border-2 p-1"
 			/>
 		</button>
-		<button on:click={onClickMoveButton(ableToMoveRight)}>
+		<button on:click={onClickMoveButton(ableToSlideRight)}>
 			<Icon
 				icon={IconArrowLeft}
 				height={40}

@@ -10,7 +10,12 @@
 <script lang="ts">
 	import Fields from '../components/Fields.svelte'
 	import NextMino from '../components/NextMino.svelte'
-	import { ableToMoveDown, getNextActiveMino, getRandomMinos } from './game'
+	import {
+		ableToSlideDown,
+		getNextActiveMino,
+		getRandomMinos,
+		ableToDeleteLine
+	} from './game'
 	import ControlPanel from '../components/ControlPanel.svelte'
 
 	// ルール
@@ -23,9 +28,11 @@
 
 	// 色付ける
 	// ボタン付ける
-	// ミノを消す
+
+	// 一列を消す
 	// ハードドロップ、ゴーストブロック
 	// 落下速度は初期値0.8s
+	// 得点
 	// ミノを消す度レベルが上がり、落下速度が上がる
 
 	let fields: Field[][] = [...Array(FIELD_HIGHT)].map((_, y) =>
@@ -86,10 +93,14 @@
 		if (isFinished) clearInterval(setIntervalId)
 		if (isStopped) return
 
-		// const res = ableToMoveDown()
-		const res = ableToMoveDown(fields, activeMino)
+		const res = ableToSlideDown(fields, activeMino)
 		// 着地した
 		if (!res) {
+			// 列を消す
+			const deletedFields = ableToDeleteLine(fields, activeMino)
+			if (deletedFields) {
+				fields = deletedFields
+			}
 			changeNextMino()
 			return
 		}
@@ -123,6 +134,8 @@
 		<ControlPanel {fields} {activeMino} {isFinished} {onMoveMino} />
 	</div>
 </div>
+
+{JSON.stringify(fields)}
 
 <!-- <p>active</p>
 <div>
