@@ -15,7 +15,8 @@
 		getNextActiveMino,
 		getRandomMinos,
 		ableToDeleteLine,
-		getDropPoint
+		getDropPoint,
+		execHardDrop
 	} from './game'
 	import ControlPanel from '../components/ControlPanel.svelte'
 
@@ -32,9 +33,9 @@
 	// 一列を消す
 	// nextMinoを2つだけ表示
 	// Fieldsの上を隠す
+	// ハードドロップ、ゴーストブロック
 
 	// キー操作説明
-	// ハードドロップ、ゴーストブロック
 	// 落下速度は初期値0.8s
 	// 得点
 	// ミノを消す度レベルが上がり、落下速度が上がる
@@ -123,6 +124,21 @@
 		dropPoint = getDropPoint(fields, activeMino)
 	}
 
+	// slideDownはdropPointが変わらないので別で関数にしている
+	const onSlideDown = () => {
+		const res = ableToSlideDown(fields, activeMino)
+		if (!!res) {
+			fields = res.fields
+			activeMino = res.activeMino
+		}
+	}
+
+	const onHardDrop = () => {
+		const res = execHardDrop(fields, activeMino, dropPoint)
+		fields = res
+		changeNextMino()
+	}
+
 	let screenSize: number
 </script>
 
@@ -141,6 +157,8 @@
 					{isFinished}
 					bind:isPaused
 					{onMoveMino}
+					{onSlideDown}
+					{onHardDrop}
 				/>
 			</div>
 		{/if}
@@ -159,6 +177,8 @@
 				{isFinished}
 				bind:isPaused
 				{onMoveMino}
+				{onSlideDown}
+				{onHardDrop}
 			/>
 		{/if}
 	</div>

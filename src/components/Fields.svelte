@@ -14,9 +14,11 @@
 		>
 			{#each field1 as field, x (x)}
 				<div
-					class={`h-6 w-6 sm:(h-7 w-7) 
-					${dropPoint.flat().find(pos => pos.x === x && pos.y === y) && 'bg-gray-100'}
-					${activeMino.flat().find(pos => pos.x === x && pos.y === y) && 'bg-red-100'}
+					class={`h-6 w-6 sm:(h-7 w-7)
+					${
+						dropPoint.flat().find(pos => pos.x === x && pos.y === y) &&
+						'border border-gray-300 bg-gray-100'
+					}
 					${field && 'border-2'}
 					${
 						field === 'I' &&
@@ -46,6 +48,8 @@
 						field === 'T' &&
 						'bg-purple-500 border-purple-300 border-b-purple-700 border-l-purple-700'
 					}
+
+
         `}
 				/>
 			{/each}

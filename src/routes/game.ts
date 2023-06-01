@@ -313,61 +313,66 @@ export const ableToDeleteLine = (
 	return false // 消す行ない
 }
 
+// 落ちるactiveMinoの場所を返す
 export const getDropPoint = (
 	fields: Field[][],
 	activeMino: ActiveMino
 ): ActiveMino => {
-	// 着地した時のactiveMinoの一番上の高さが分かれば良さそう？
-	// xはactiveMinoの横幅でOK
-	// フィールドの高さ
 	let dropPointY = activeMino[0][0].y
 
+	// 全てのfor文をreturnで抜けるための関数
 	const fn = () => {
+		// フィールドの高さ
 		for (
-			// let iy1 = activeMino[activeMino.length - 1][0].y;
-			let iy1 = activeMino[0][0].y;
-			iy1 < FIELD_HIGHT - activeMino.length + 2;
-			iy1++
+			let iy = activeMino[0][0].y;
+			iy < FIELD_HIGHT - activeMino.length + 2;
+			iy++
 		) {
-			// activeMinoの高さ
-			for (let iy2 = 0; iy2 < activeMino.length; iy2++) {
-				// activeMinoの横幅
-				for (let ix = 0; ix < activeMino[0].length; ix++) {
-					const realX = activeMino[0][ix].x
-					const realY = iy1 + iy2
-					const mino = activeMino[iy2][ix] // activeMinoの位置
-					console.log(iy1, iy2, realY)
+			// activeMino内の高さ
+			for (
+				let activeMinoY = 0;
+				activeMinoY < activeMino.length;
+				activeMinoY++
+			) {
+				// activeMino内の横幅
+				for (
+					let activeMinoX = 0;
+					activeMinoX < activeMino[0].length;
+					activeMinoX++
+				) {
+					const fieldX = activeMino[0][activeMinoX].x
+					const fieldY = iy + activeMinoY
+					const mino = activeMino[activeMinoY][activeMinoX] // activeMinoの位置
 
-					if (!mino.value) continue // nullは無視
 					if (
-						realX < 0 || // 左にはみ出る
-						realX >= FIELD_WIDTH // 右にはみ出る
+						!mino.value || // nullは無視
+						fieldX < 0 || // 左にはみ出る
+						fieldX >= FIELD_WIDTH // 右にはみ出る
 					) {
 						continue
 					}
 					if (
-						realY >= FIELD_HIGHT // 下にはみ出る
+						fieldY >= FIELD_HIGHT // 下にはみ出る
 					) {
 						return
 					}
-					const field = fields[realY][realX]
+					const field = fields[fieldY][fieldX]
 
-					// ぶつかったのが自分でないなら
+					// ぶつかったのが自分でないなら終了
 					if (field) {
 						// 下のフィールドが自分
 						const isSelfCollision = activeMino
 							.flat()
-							.find(pos => pos.x === realX && pos.y === realY)
+							.find(pos => pos.x === fieldX && pos.y === fieldY)
 
 						if (!isSelfCollision) {
-							console.log({ realX }, { realY }, 'ぶつかった')
 							return
 						}
 					}
 				}
 			}
 
-			dropPointY = iy1
+			dropPointY = iy
 		}
 	}
 	fn()
@@ -378,70 +383,29 @@ export const getDropPoint = (
 	return dropPoint
 }
 
-// 置くときは、その位置にactiveMinoのvalueを入れて、changeNextMino
-// export const getDropPoint = (
-// 	fields: Field[][],
-// 	activeMino: ActiveMino
-// ): ActiveMino => {
-// 	// ミノを表示している部分で取得（activeMino）
-// 	// const leftActiveMinoX = activeMino[0][0].x
-// 	// const length = activeMino.length
-// 	// const bottomActiveMinoY = activeMino[activeMino.length - 1][0].y
+// ハードドロップを実行後のfieldsを返す
+export const execHardDrop = (
+	fields: Field[][],
+	activeMino: ActiveMino,
+	dropPoint: ActiveMino
+): Field[][] => {
+	const testFields = structuredClone(fields)
 
-// 	if (!activeMino.length) return []
+	for (let iy = 0; iy < activeMino.length; iy++) {
+		for (let ix = 0; ix < activeMino.length; ix++) {
+			const { y, x, value } = activeMino[iy][ix]
+			if (!value) continue
+			testFields[y][x] = null
+		}
+	}
 
-// 	let leftActiveMinoX = FIELD_WIDTH
-// 	let rightActiveMinoX = 0
-// 	let topActiveMinoY = FIELD_HIGHT
-// 	let bottomActiveMinoY = 0
-// 	for (let iy = 0; iy < activeMino.length; iy++) {
-// 		for (let ix = 0; ix < activeMino[0].length; ix++) {
-// 			const mino = activeMino[iy][ix]
-// 			if (!mino.value) continue
-// 			if (mino.x < leftActiveMinoX) leftActiveMinoX = mino.x
-// 			if (mino.x > rightActiveMinoX) rightActiveMinoX = mino.x
-// 			if (mino.y < topActiveMinoY) topActiveMinoY = mino.y
-// 			if (mino.y > bottomActiveMinoY) bottomActiveMinoY = mino.y
-// 		}
-// 	}
-// 	let height = bottomActiveMinoY - topActiveMinoY + 1
-
-// 	console.log(
-// 		{ leftActiveMinoX },
-// 		{ rightActiveMinoX },
-// 		{ topActiveMinoY },
-// 		{ bottomActiveMinoY },
-// 		{ height }
-// 	)
-
-// 	// dropPintYを見つける
-// 	let dropPointY = bottomActiveMinoY
-
-// 	for (let iy = bottomActiveMinoY; iy < FIELD_HIGHT; iy++) {
-// 		for (let ix = leftActiveMinoX; ix <= rightActiveMinoX; ix++) {
-// 			// ミノの話
-
-// 			// フィールドの話
-// 			if (ix < 0 || ix >= FIELD_WIDTH) continue // 横にはみ出たら無視する
-// 			const field = fields[iy][ix]
-// 			if (field) break
-
-// 			if (ix === rightActiveMinoX) {
-// 				dropPointY = iy
-// 			}
-// 		}
-// 	}
-
-// 	// 落下地点yが分かれば、activeMinoループしてy: y+iyして返す
-// 	// activeMinoの一行が全てnullなら消してから処理する
-
-// 	// const dropPoint = activeMino.map((_, iy) =>
-// 	// 	_.map((v, ix) => ({ ...v, y: dropPointY - topActiveMinoY + 1 + iy }))
-// 	// )
-// 	const dropPoint = activeMino
-// 		.map((_, iy) => _.map(v => ({ ...v, y: dropPointY - height + 1 + iy })))
-// 		.map(_ => _.filter(v => v.value))
-
-// 	console.log({ dropPointY }, dropPoint)
-// 	return dropPoint
-// }
+	// 右端でやると枠広がる
+	for (let iy = 0; iy < dropPoint.length; iy++) {
+		const dropPointX = dropPoint[iy]
+		for (let ix = 0; ix < dropPointX.length; ix++) {
+			const { y, x, value } = dropPoint[iy][ix]
+			testFields[y][x] = value
+		}
+	}
+	return testFields
+}
