@@ -1,7 +1,9 @@
 <script lang="ts">
-	import type { Field } from '../routes/+page.svelte'
+	import type { ActiveMino, Field } from '../routes/+page.svelte'
 
 	export let fields: Field[][] = []
+	export let dropPoint: ActiveMino = []
+	export let activeMino: ActiveMino = []
 </script>
 
 <div class="border-black border-2">
@@ -13,6 +15,8 @@
 			{#each field1 as field, x (x)}
 				<div
 					class={`h-6 w-6 sm:(h-7 w-7) 
+					${dropPoint.flat().find(pos => pos.x === x && pos.y === y) && 'bg-gray-100'}
+					${activeMino.flat().find(pos => pos.x === x && pos.y === y) && 'bg-red-100'}
 					${field && 'border-2'}
 					${
 						field === 'I' &&

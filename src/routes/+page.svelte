@@ -14,7 +14,8 @@
 		ableToSlideDown,
 		getNextActiveMino,
 		getRandomMinos,
-		ableToDeleteLine
+		ableToDeleteLine,
+		getDropPoint
 	} from './game'
 	import ControlPanel from '../components/ControlPanel.svelte'
 
@@ -43,6 +44,7 @@
 	)
 	let randomMinos: Field[][][] = []
 	let activeMino: ActiveMino = []
+	let dropPoint: ActiveMino = []
 
 	let isFinished = false
 
@@ -81,6 +83,8 @@
 		randomMinos = rest // randomMinos[1~6]
 
 		spawnMinoInField()
+
+		dropPoint = getDropPoint(fields, activeMino)
 	}
 
 	let isPaused = false
@@ -115,6 +119,8 @@
 	const onMoveMino = (v: { fields: Field[][]; activeMino: ActiveMino }) => {
 		fields = v.fields
 		activeMino = v.activeMino
+
+		dropPoint = getDropPoint(fields, activeMino)
 	}
 
 	let screenSize: number
@@ -123,10 +129,10 @@
 <!-- windowの横幅を取得 -->
 <svelte:window bind:innerWidth={screenSize} />
 
-<div class="flex pb-10 gap-3">
+<div class="flex pb-10 gap-3 items-start sm:items-stretch">
 	<!-- フィールド -->
 	<div>
-		<Fields {fields} />
+		<Fields {fields} {dropPoint} {activeMino} />
 		{#if screenSize <= 640}
 			<div class="mt-3 grid place-items-center">
 				<ControlPanel
@@ -139,8 +145,13 @@
 			</div>
 		{/if}
 	</div>
-	<div class="flex flex-col justify-between items-start">
+	<div class="flex flex-col gap-3 justify-between items-start">
 		<NextMino {randomMinos} />
+
+		<div>
+			<p>レベル 1</p>
+			<p>スコア 0</p>
+		</div>
 		{#if screenSize > 640}
 			<ControlPanel
 				{fields}
