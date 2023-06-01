@@ -83,7 +83,7 @@
 		spawnMinoInField()
 	}
 
-	let isStopped = false
+	let isPaused = false
 	// 一定間隔で下にずらす
 	const setIntervalId = setInterval(() => {
 		// activeMinoがない時は追加する
@@ -94,7 +94,7 @@
 
 		// ゲームが終了したらintervalを停止
 		if (isFinished) clearInterval(setIntervalId)
-		if (isStopped) return
+		if (isPaused) return
 
 		const res = ableToSlideDown(fields, activeMino)
 		// 着地した
@@ -116,30 +116,39 @@
 		fields = v.fields
 		activeMino = v.activeMino
 	}
+
+	let screenSize: number
 </script>
 
-<h1 class="font-bold text-center text-40px">テトリス</h1>
+<!-- windowの横幅を取得 -->
+<svelte:window bind:innerWidth={screenSize} />
 
-<button on:click={() => (isStopped = !isStopped)}
-	>{isStopped ? '再開' : '止める'}</button
->
-
-{#if isFinished === true}
-	<p>終了！</p>
-{/if}
-
-<div class="flex mt-8 pb-10 gap-3">
+<div class="flex pb-10 gap-3">
 	<!-- フィールド -->
 	<div>
 		<Fields {fields} />
-		<div class="mt-3 grid place-items-center sm:hidden">
-			<ControlPanel {fields} {activeMino} {isFinished} {onMoveMino} />
-		</div>
+		{#if screenSize <= 640}
+			<div class="mt-3 grid place-items-center">
+				<ControlPanel
+					{fields}
+					{activeMino}
+					{isFinished}
+					bind:isPaused
+					{onMoveMino}
+				/>
+			</div>
+		{/if}
 	</div>
 	<div class="flex flex-col justify-between items-start">
 		<NextMino {randomMinos} />
-		<div class="hidden sm:block">
-			<ControlPanel {fields} {activeMino} {isFinished} {onMoveMino} />
-		</div>
+		{#if screenSize > 640}
+			<ControlPanel
+				{fields}
+				{activeMino}
+				{isFinished}
+				bind:isPaused
+				{onMoveMino}
+			/>
+		{/if}
 	</div>
 </div>
