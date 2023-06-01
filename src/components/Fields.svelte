@@ -16,7 +16,9 @@
 				<div
 					class={`h-6 w-6 sm:(h-7 w-7)
 					${
-						dropPoint.flat().find(pos => pos.x === x && pos.y === y) &&
+						dropPoint
+							.flat()
+							.find(pos => pos.value && pos.x === x && pos.y === y) &&
 						'border border-gray-300 bg-gray-100'
 					}
 					${field && 'border-2'}

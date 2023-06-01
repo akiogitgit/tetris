@@ -263,7 +263,7 @@ export const ableToRotateLeft = (fields: Field[][], activeMino: ActiveMino) => {
 export const ableToDeleteLine = (
 	fields: Field[][],
 	activeMino: ActiveMino
-): false | Field[][] => {
+): false | { fields: Field[][]; deleteLineCount: number } => {
 	const testFields = structuredClone(fields)
 	const topActiveMinoY = activeMino[0][0].y // activeMinoの左上のマスの高さ
 	const nullLine: Field[] = [...Array(FIELD_WIDTH)].map(() => null) // 空の行
@@ -309,7 +309,7 @@ export const ableToDeleteLine = (
 		nextDropY-- // 次の落ちる高さを1つ上にする
 	}
 
-	if (deleteLineCount) return testFields
+	if (deleteLineCount) return { fields: testFields, deleteLineCount }
 	return false // 消す行ない
 }
 
@@ -377,9 +377,10 @@ export const getDropPoint = (
 	}
 	fn()
 
-	const dropPoint = activeMino
-		.map((_, iy) => _.map(v => ({ ...v, y: dropPointY + iy })))
-		.map(_ => _.filter(v => v.value))
+	// activeMinoのyにdropPointYを加算
+	const dropPoint = activeMino.map((_, iy) =>
+		_.map(v => ({ ...v, y: dropPointY + iy }))
+	)
 	return dropPoint
 }
 
@@ -388,24 +389,33 @@ export const execHardDrop = (
 	fields: Field[][],
 	activeMino: ActiveMino,
 	dropPoint: ActiveMino
-): Field[][] => {
+): false | { fields: Field[][]; activeMino: ActiveMino } => {
+	// 引数の配列をコピー
 	const testFields = structuredClone(fields)
 
+	// fieldsからactiveMinoを除く
 	for (let iy = 0; iy < activeMino.length; iy++) {
 		for (let ix = 0; ix < activeMino.length; ix++) {
 			const { y, x, value } = activeMino[iy][ix]
-			if (!value) continue
+			if (!value) continue // 右端でやると枠広がる
 			testFields[y][x] = null
 		}
 	}
 
-	// 右端でやると枠広がる
+	// fieldsにactiveMinoを追加
 	for (let iy = 0; iy < dropPoint.length; iy++) {
 		const dropPointX = dropPoint[iy]
 		for (let ix = 0; ix < dropPointX.length; ix++) {
 			const { y, x, value } = dropPoint[iy][ix]
+			if (!value) continue // 右端でやると枠広がる
 			testFields[y][x] = value
 		}
 	}
-	return testFields
+
+	const dropPointY = dropPoint[0][0].y
+	const testActiveMino = activeMino.map((_, iy) =>
+		_.map(v => ({ ...v, y: dropPointY + iy }))
+	)
+
+	return { fields: testFields, activeMino: testActiveMino }
 }

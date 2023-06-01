@@ -61,7 +61,6 @@
 				break
 			// ハードドロップ
 			case 'Space':
-				console.log('スペース')
 				onHardDrop()
 		}
 		if (!!res) {

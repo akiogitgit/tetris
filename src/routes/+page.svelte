@@ -48,6 +48,8 @@
 	let dropPoint: ActiveMino = []
 
 	let isFinished = false
+	let score = 0 // 1列50点、2:200, 3:450, 4:800
+	let level = 1 // 10ライン消すごとに1上がる
 
 	// currentMinoをフィールドに出現
 	// 終了判定はここだけでOK
@@ -88,6 +90,15 @@
 		dropPoint = getDropPoint(fields, activeMino)
 	}
 
+	const deleteLine = () => {
+		const deletedFields = ableToDeleteLine(fields, activeMino)
+		if (deletedFields) {
+			fields = deletedFields.fields
+			const deleteLine = deletedFields.deleteLineCount
+			score += deleteLine * deleteLine * 50
+		}
+	}
+
 	let isPaused = false
 	// 一定間隔で下にずらす
 	const setIntervalId = setInterval(() => {
@@ -104,12 +115,8 @@
 		const res = ableToSlideDown(fields, activeMino)
 		// 着地した
 		if (!res) {
-			// 列を消す
-			const deletedFields = ableToDeleteLine(fields, activeMino)
-			if (deletedFields) {
-				fields = deletedFields
-			}
-			changeNextMino()
+			deleteLine() // 列を消す
+			changeNextMino() // 次のミノ
 			return
 		}
 		// currentMinoを下にずらす
@@ -135,8 +142,13 @@
 
 	const onHardDrop = () => {
 		const res = execHardDrop(fields, activeMino, dropPoint)
-		fields = res
-		changeNextMino()
+		if (!!res) {
+			fields = res.fields
+			activeMino = res.activeMino
+		}
+
+		deleteLine() // 列を消す
+		changeNextMino() // 次のミノ
 	}
 
 	let screenSize: number
@@ -167,8 +179,8 @@
 		<NextMino {randomMinos} />
 
 		<div>
-			<p>レベル 1</p>
-			<p>スコア 0</p>
+			<p>レベル {level}</p>
+			<p>スコア {score}</p>
 		</div>
 		{#if screenSize > 640}
 			<ControlPanel
