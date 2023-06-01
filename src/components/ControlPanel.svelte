@@ -86,9 +86,9 @@
 <!-- ボタン、キーボード操作 -->
 <svelte:window on:keydown={handleKeydown} />
 
-<div>
-	<div class="text-center">
-		<button on:click={onClickMoveButton(ableToRotateLeft)}>
+<div class="flex flex-col gap-1">
+	<div class="h-10 text-center">
+		<button on:click={onClickMoveButton(ableToRotateLeft)} class="h-10">
 			<Icon
 				icon={IconRotate}
 				height={40}
@@ -98,8 +98,8 @@
 		</button>
 	</div>
 
-	<div>
-		<button on:click={onClickMoveButton(ableToSlideLeft)}>
+	<div class="flex h-10 gap-1">
+		<button on:click={onClickMoveButton(ableToSlideLeft)} class="h-10">
 			<Icon
 				icon={IconArrowLeft}
 				height={40}
@@ -108,7 +108,7 @@
 			/>
 		</button>
 
-		<button on:click={onClickMoveButton(ableToSlideDown)}>
+		<button on:click={onClickMoveButton(ableToSlideDown)} class="h-10">
 			<Icon
 				icon={IconArrowDown}
 				height={40}
@@ -116,7 +116,7 @@
 				class="border-black border-2 p-1"
 			/>
 		</button>
-		<button on:click={onClickMoveButton(ableToSlideRight)}>
+		<button on:click={onClickMoveButton(ableToSlideRight)} class="h-10">
 			<Icon
 				icon={IconArrowLeft}
 				height={40}

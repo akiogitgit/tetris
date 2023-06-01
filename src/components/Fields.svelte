@@ -2,14 +2,12 @@
 	import type { ActiveMino, Field } from '../routes/+page.svelte'
 
 	export let fields: Field[][] = []
-	export let activeMino: ActiveMino = []
 </script>
 
 <div class="border-black border-2">
 	{#each fields as field1, y (y)}
 		<div
-			class={`${y < 3 && 'bg-gray-100'} ${
-				y === 2 && 'border-b-2 border-black'
+			class={`${y < 3 && 'hidden'} 
 			} flex`}
 		>
 			{#each field1 as field, x (x)}

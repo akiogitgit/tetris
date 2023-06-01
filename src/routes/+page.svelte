@@ -28,8 +28,11 @@
 
 	// 色付ける
 	// ボタン付ける
-
 	// 一列を消す
+	// nextMinoを2つだけ表示
+	// Fieldsの上を隠す
+
+	// キー操作説明
 	// ハードドロップ、ゴーストブロック
 	// 落下速度は初期値0.8s
 	// 得点
@@ -125,27 +128,12 @@
 	<p>終了！</p>
 {/if}
 
-<div class="flex mt-8 gap-3 items-start">
+<div class="flex mt-8 gap-3">
 	<!-- フィールド -->
-	<Fields {fields} {activeMino} />
+	<Fields {fields} />
 
-	<div class="flex flex-col gap-3">
+	<div class="flex flex-col justify-between items-start">
 		<NextMino {randomMinos} />
 		<ControlPanel {fields} {activeMino} {isFinished} {onMoveMino} />
 	</div>
 </div>
-
-{JSON.stringify(fields)}
-
-<!-- <p>active</p>
-<div>
-	{#each activeMino as field2, x (x)}
-		<div class="flex">
-			{#each field2 as field, x (x)}
-				<div class={`border h-7 w-7 ${field.value && 'bg-blue-100'}`}>
-					{field.x}{field.y}
-				</div>
-			{/each}
-		</div>
-	{/each}
-</div> -->
