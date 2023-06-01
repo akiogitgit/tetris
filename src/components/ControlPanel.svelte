@@ -32,7 +32,7 @@
 
 		// ポーズ
 		if (code === 'KeyP') isPaused = !isPaused
-		// if (isPaused) return
+		if (isPaused) return
 
 		let res:
 			| false
