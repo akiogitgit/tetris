@@ -52,9 +52,6 @@ devDependencies:
   vite-plugin-windicss:
     specifier: ^1.9.0
     version: 1.9.0(vite@4.3.9)
-  windicss:
-    specifier: ^3.5.6
-    version: 3.5.6
 
 packages:
 

@@ -128,12 +128,18 @@
 	<p>終了！</p>
 {/if}
 
-<div class="flex mt-8 gap-3">
+<div class="flex mt-8 pb-10 gap-3">
 	<!-- フィールド -->
-	<Fields {fields} />
-
+	<div>
+		<Fields {fields} />
+		<div class="mt-3 grid place-items-center sm:hidden">
+			<ControlPanel {fields} {activeMino} {isFinished} {onMoveMino} />
+		</div>
+	</div>
 	<div class="flex flex-col justify-between items-start">
 		<NextMino {randomMinos} />
-		<ControlPanel {fields} {activeMino} {isFinished} {onMoveMino} />
+		<div class="hidden sm:block">
+			<ControlPanel {fields} {activeMino} {isFinished} {onMoveMino} />
+		</div>
 	</div>
 </div>

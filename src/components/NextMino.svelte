@@ -4,18 +4,17 @@
 	export let randomMinos: Field[][][] = []
 </script>
 
-<div>
-	<div class="flex flex-col gap-3">
-		{#each randomMinos.slice(0, 2) as field1, y (y)}
-			<div
-				class="border-black border-2 h-116px grid w-116px place-items-center"
-			>
-				<div>
-					{#each field1 as field2, x (x)}
-						<div class="flex">
-							{#each field2 as field, x (x)}
-								<div
-									class={`h-7 w-7 
+<div class="flex flex-col gap-3">
+	{#each randomMinos.slice(0, 2) as field1, y (y)}
+		<div
+			class="border-black border-2 h-100px grid w-100px place-items-center sm:(h-140px w-140px)"
+		>
+			<div>
+				{#each field1 as field2, x (x)}
+					<div class="flex">
+						{#each field2 as field, x (x)}
+							<div
+								class={`h-6 w-6 sm:(h-7 w-7) 
 								${field && 'border-2'}
 								${
 									field === 'I' &&
@@ -46,12 +45,11 @@
 									'bg-purple-500 border-purple-300 border-b-purple-700 border-l-purple-700'
 								}
 							`}
-								/>
-							{/each}
-						</div>
-					{/each}
-				</div>
+							/>
+						{/each}
+					</div>
+				{/each}
 			</div>
-		{/each}
-	</div>
+		</div>
+	{/each}
 </div>

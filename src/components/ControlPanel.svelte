@@ -22,7 +22,6 @@
 	}) => void
 
 	const handleKeydown = (e: KeyboardEvent) => {
-		// const handleKeydown = (e: {code:"string"}) => {
 		if (isFinished) return
 		const code = e.code
 		e.preventDefault() // ブラウザ本来の挙動をさせない
@@ -86,12 +85,12 @@
 <!-- ボタン、キーボード操作 -->
 <svelte:window on:keydown={handleKeydown} />
 
-<div class="flex flex-col gap-1">
+<!-- <div class="flex flex-col gap-1">
 	<div class="h-10 text-center">
 		<button on:click={onClickMoveButton(ableToRotateLeft)} class="h-10">
 			<Icon
 				icon={IconRotate}
-				height={40}
+				height={44}
 				width={40}
 				class="border-black border-2 p-1"
 			/>
@@ -121,6 +120,48 @@
 				icon={IconArrowLeft}
 				height={40}
 				width={40}
+				rotate={90}
+				class="border-black border-2 p-1"
+			/>
+		</button>
+	</div>
+</div> -->
+
+<div class="flex flex-col w-fit gap-1">
+	<div class="h-11 text-center">
+		<button on:click={onClickMoveButton(ableToRotateLeft)} class="h-11">
+			<Icon
+				icon={IconRotate}
+				height={44}
+				width={44}
+				class="border-black border-2 p-1"
+			/>
+		</button>
+	</div>
+
+	<div class="flex h-11 gap-1">
+		<button on:click={onClickMoveButton(ableToSlideLeft)} class="h-11">
+			<Icon
+				icon={IconArrowLeft}
+				height={44}
+				width={44}
+				class="border-black border-2 p-1"
+			/>
+		</button>
+
+		<button on:click={onClickMoveButton(ableToSlideDown)} class="h-11">
+			<Icon
+				icon={IconArrowDown}
+				height={44}
+				width={44}
+				class="border-black border-2 p-1"
+			/>
+		</button>
+		<button on:click={onClickMoveButton(ableToSlideRight)} class="h-11">
+			<Icon
+				icon={IconArrowLeft}
+				height={44}
+				width={44}
 				rotate={90}
 				class="border-black border-2 p-1"
 			/>

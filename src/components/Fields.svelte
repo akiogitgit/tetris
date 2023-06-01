@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { ActiveMino, Field } from '../routes/+page.svelte'
+	import type { Field } from '../routes/+page.svelte'
 
 	export let fields: Field[][] = []
 </script>
@@ -12,7 +12,7 @@
 		>
 			{#each field1 as field, x (x)}
 				<div
-					class={`h-7 w-7 
+					class={`h-6 w-6 sm:(h-7 w-7) 
 					${field && 'border-2'}
 					${
 						field === 'I' &&
