@@ -265,14 +265,16 @@ export const ableToDeleteLine = (
 	activeMino: ActiveMino
 ): false | Field[][] => {
 	const testFields = structuredClone(fields)
+	const topActiveMinoY = activeMino[0][0].y // activeMinoの左上のマスの高さ
+	const nullLine: Field[] = [...Array(FIELD_WIDTH)].map(() => null) // 空の行
+
 	let deleteLineCount = 0
-	const activeMinoY = activeMino[0][0].y // activeMinoの左上のマスの高さ
+	let bottomDeleteLineY = 0 // 一番下の消した時の行の高さ
 
-	const nullLine: Field[] = [...Array(FIELD_WIDTH)].map(() => null)
-
+	// 行を消す処理
 	// activeMinoの高さの行を一列ずつ全て埋まっているか確認
-	for (let iy = activeMinoY; iy < activeMinoY + activeMino.length; iy++) {
-		if (iy >= FIELD_HIGHT) break
+	for (let iy = topActiveMinoY; iy < topActiveMinoY + activeMino.length; iy++) {
+		if (iy >= FIELD_HIGHT) break // 下にはみ出たらループを抜ける
 
 		for (let ix = 0; ix < FIELD_WIDTH; ix++) {
 			if (ix < 0 || ix >= FIELD_WIDTH) continue
@@ -282,12 +284,31 @@ export const ableToDeleteLine = (
 
 			// このiyの行が全て埋まっている
 			if (ix === FIELD_WIDTH - 1) {
-				deleteLineCount++
 				testFields[iy] = [...nullLine] // testFieldsのiyの行を消す
+				deleteLineCount++
+				bottomDeleteLineY = iy
 			}
 		}
 	}
 
+	// 下に下げる処理
+	let nextDropY = bottomDeleteLineY // 次の下ろす行の高さ, 地面から連続している行の高さ
+
+	// 一番下の消した行-1 ~ フィールドの一番上の座標までループ
+	for (let iy = bottomDeleteLineY - 1; iy > 2; iy--) {
+		const fieldLine = testFields[iy]
+		const isLineNull = !fieldLine.find(v => v !== null)
+
+		// topActiveMinoYより上からは、行が空なら終了
+		if (iy < topActiveMinoY && isLineNull) break
+		if (isLineNull) continue // topActiveMinoYより下で空の列なら無視
+
+		// 自分が落ちる高さに自分の行を代入し、自分の行を空行にする
+		testFields[nextDropY] = [...fieldLine]
+		testFields[iy] = [...nullLine]
+		nextDropY-- // 次の落ちる高さを1つ上にする
+	}
+
 	if (deleteLineCount) return testFields
-	return false
+	return false // 消す行ない
 }
