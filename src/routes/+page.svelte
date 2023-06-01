@@ -34,11 +34,11 @@
 	// nextMinoを2つだけ表示
 	// Fieldsの上を隠す
 	// ハードドロップ、ゴーストブロック
+	// 得点
+	// 落下速度は初期値0.8s
+	// ミノを消す度レベルが上がり、落下速度が上がる
 
 	// キー操作説明
-	// 落下速度は初期値0.8s
-	// 得点
-	// ミノを消す度レベルが上がり、落下速度が上がる
 
 	let fields: Field[][] = [...Array(FIELD_HIGHT)].map((_, y) =>
 		[...Array(FIELD_WIDTH)].map(() => null)
@@ -49,12 +49,15 @@
 
 	let isFinished = false
 	let score = 0 // 1列50点、2:200, 3:450, 4:800
+	let line = 0
 	let level = 1 // 10ライン消すごとに1上がる
+	const initDropSpeed = 0.8
+	let dropSpeed = initDropSpeed
 
 	// currentMinoをフィールドに出現
 	// 終了判定はここだけでOK
 	const spawnMinoInField = () => {
-		const testFileds: Field[][] = structuredClone(fields)
+		const testFields: Field[][] = structuredClone(fields)
 		for (let iy = 0; iy < activeMino.length; iy++) {
 			const fieldsX = activeMino[iy]
 			for (let ix = 0; ix < fieldsX.length; ix++) {
@@ -64,15 +67,15 @@
 				if (!value) continue // 値がnullなら無視
 
 				// 一部分でもミノの置く位置が埋まっていたら終了
-				if (testFileds[y][x]) {
+				if (testFields[y][x]) {
 					isFinished = true
 					return
 				}
-				testFileds[y][x] = value
+				testFields[y][x] = value
 			}
 		}
 		// ミノ全体を置ければ置く
-		fields = testFileds
+		fields = testFields
 	}
 
 	const changeNextMino = () => {
@@ -90,40 +93,52 @@
 		dropPoint = getDropPoint(fields, activeMino)
 	}
 
+	// 行を消せるかチェックして消せれば消す
 	const deleteLine = () => {
 		const deletedFields = ableToDeleteLine(fields, activeMino)
-		if (deletedFields) {
-			fields = deletedFields.fields
-			const deleteLine = deletedFields.deleteLineCount
-			score += deleteLine * deleteLine * 50
-		}
+		if (!deletedFields) return
+
+		const deleteLine = deletedFields.deleteLineCount
+		fields = deletedFields.fields
+		score += deleteLine * deleteLine * 50
+		line += deleteLine
+		level = Math.ceil((line + 1) / 10)
+		dropSpeed = initDropSpeed ** level
+
+		startGame()
 	}
 
 	let isPaused = false
-	// 一定間隔で下にずらす
-	const setIntervalId = setInterval(() => {
-		// activeMinoがない時は追加する
-		if (!activeMino.length) {
-			changeNextMino()
-			return
-		}
+	let setIntervalId = 0
+	// 一定間隔で下にずらす 実行するとともに間隔を更新する
+	const startGame = () => {
+		clearInterval(setIntervalId)
+		setIntervalId = setInterval(() => {
+			// activeMinoがない時は追加する
+			if (!activeMino.length) {
+				changeNextMino()
+				return
+			}
 
-		// ゲームが終了したらintervalを停止
-		if (isFinished) clearInterval(setIntervalId)
-		if (isPaused) return
+			// ゲームが終了したらintervalを停止
+			if (isFinished) clearInterval(setIntervalId)
+			if (isPaused) return
 
-		const res = ableToSlideDown(fields, activeMino)
-		// 着地した
-		if (!res) {
-			deleteLine() // 列を消す
-			changeNextMino() // 次のミノ
-			return
-		}
-		// currentMinoを下にずらす
-		fields = res.fields
-		activeMino = res.activeMino
-	}, 1000)
+			// 着地したかチェック
+			const res = ableToSlideDown(fields, activeMino)
+			if (!res) {
+				deleteLine() // 列を消す
+				changeNextMino() // 次のミノ
+				return
+			}
+			// currentMinoを下にずらす
+			fields = res.fields
+			activeMino = res.activeMino
+		}, dropSpeed * 1000)
+	}
+	startGame()
 
+	// ミノを動かせた時の処理
 	const onMoveMino = (v: { fields: Field[][]; activeMino: ActiveMino }) => {
 		fields = v.fields
 		activeMino = v.activeMino
@@ -181,6 +196,7 @@
 		<div>
 			<p>レベル {level}</p>
 			<p>スコア {score}</p>
+			<p>ライン {line}</p>
 		</div>
 		{#if screenSize > 640}
 			<ControlPanel
