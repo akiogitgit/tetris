@@ -312,3 +312,100 @@ export const ableToDeleteLine = (
 	if (deleteLineCount) return testFields
 	return false // 消す行ない
 }
+
+// 落ちるactiveMinoの場所を返す
+export const getDropPoint = (
+	fields: Field[][],
+	activeMino: ActiveMino
+): ActiveMino => {
+	let dropPointY = activeMino[0][0].y
+
+	// 全てのfor文をreturnで抜けるための関数
+	const fn = () => {
+		// フィールドの高さ
+		for (
+			let iy = activeMino[0][0].y;
+			iy < FIELD_HIGHT - activeMino.length + 2;
+			iy++
+		) {
+			// activeMino内の高さ
+			for (
+				let activeMinoY = 0;
+				activeMinoY < activeMino.length;
+				activeMinoY++
+			) {
+				// activeMino内の横幅
+				for (
+					let activeMinoX = 0;
+					activeMinoX < activeMino[0].length;
+					activeMinoX++
+				) {
+					const fieldX = activeMino[0][activeMinoX].x
+					const fieldY = iy + activeMinoY
+					const mino = activeMino[activeMinoY][activeMinoX] // activeMinoの位置
+
+					if (
+						!mino.value || // nullは無視
+						fieldX < 0 || // 左にはみ出る
+						fieldX >= FIELD_WIDTH // 右にはみ出る
+					) {
+						continue
+					}
+					if (
+						fieldY >= FIELD_HIGHT // 下にはみ出る
+					) {
+						return
+					}
+					const field = fields[fieldY][fieldX]
+
+					// ぶつかったのが自分でないなら終了
+					if (field) {
+						// 下のフィールドが自分
+						const isSelfCollision = activeMino
+							.flat()
+							.find(pos => pos.x === fieldX && pos.y === fieldY)
+
+						if (!isSelfCollision) {
+							return
+						}
+					}
+				}
+			}
+
+			dropPointY = iy
+		}
+	}
+	fn()
+
+	const dropPoint = activeMino
+		.map((_, iy) => _.map(v => ({ ...v, y: dropPointY + iy })))
+		.map(_ => _.filter(v => v.value))
+	return dropPoint
+}
+
+// ハードドロップを実行後のfieldsを返す
+export const execHardDrop = (
+	fields: Field[][],
+	activeMino: ActiveMino,
+	dropPoint: ActiveMino
+): Field[][] => {
+	const testFields = structuredClone(fields)
+
+	for (let iy = 0; iy < activeMino.length; iy++) {
+		for (let ix = 0; ix < activeMino.length; ix++) {
+			const { y, x, value } = activeMino[iy][ix]
+			if (!value) continue
+			testFields[y][x] = null
+		}
+	}
+
+	// 右端でやると枠広がる
+	for (let iy = 0; iy < dropPoint.length; iy++) {
+		const dropPointX = dropPoint[iy]
+		for (let ix = 0; ix < dropPointX.length; ix++) {
+			const { y, x, value } = dropPoint[iy][ix]
+			testFields[y][x] = value
+		}
+	}
+	return testFields
+}

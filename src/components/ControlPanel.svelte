@@ -22,6 +22,8 @@
 		fields: Field[][]
 		activeMino: ActiveMino
 	}) => void
+	export let onSlideDown: () => void
+	export let onHardDrop: () => void
 
 	const handleKeydown = (e: KeyboardEvent) => {
 		if (isFinished) return
@@ -30,7 +32,7 @@
 
 		// ポーズ
 		if (code === 'KeyP') isPaused = !isPaused
-		if (isPaused) return
+		// if (isPaused) return
 
 		let res:
 			| false
@@ -47,7 +49,7 @@
 				res = ableToSlideLeft(fields, activeMino)
 				break
 			case 'ArrowDown':
-				res = ableToSlideDown(fields, activeMino)
+				onSlideDown()
 				break
 			// 回転
 			case 'ArrowUp':
@@ -60,6 +62,7 @@
 			// ハードドロップ
 			case 'Space':
 				console.log('スペース')
+				onHardDrop()
 		}
 		if (!!res) {
 			onMoveMino(res)
