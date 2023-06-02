@@ -167,32 +167,40 @@
 	}
 </script>
 
-<div class="flex mb-8 gap-3 items-start">
-	<!-- <div class="flex pb-10 gap-3 items-start sm:items-stretch"> -->
-	<!-- フィールド -->
-	<div>
+<div>
+	<div class="flex gap-3 items-start">
+		<!-- フィールド -->
 		<Fields {fields} {dropPoint} />
-		<div class="mt-3 grid place-items-center sm:hidden">
-			<!-- <div class="mt-3"> -->
-			<ControlPanel
-				{fields}
-				{activeMino}
-				{isFinished}
-				bind:isPaused
-				{onMoveMino}
-				{onSlideDown}
-				{onHardDrop}
-			/>
+		<div class="flex flex-col gap-3 justify-between items-start">
+			<NextMino {randomMinos} />
+
+			<div class="flex flex-col mx-auto text-center text-lg gap-3">
+				<p>レベル<span class="font-bold block">{level}</span></p>
+				<p>ライン <span class="font-bold block">{line}</span></p>
+				<p>スコア <span class="font-bold block">{score}</span></p>
+			</div>
 		</div>
 	</div>
-	<div class="flex flex-col gap-3 justify-between items-start">
-		<NextMino {randomMinos} />
 
-		<!-- class="flex flex-col text-lg text-center gap-3 items-center justify-center" -->
-		<div class="flex flex-col mx-auto text-center text-lg gap-3">
-			<p>レベル<span class="font-bold block">{level}</span></p>
-			<p>ライン <span class="font-bold block">{line}</span></p>
-			<p>スコア <span class="font-bold block">{score}</span></p>
-		</div>
+	<div class="mt-3 grid place-items-center sm:hidden">
+		<ControlPanel
+			{fields}
+			{activeMino}
+			{isFinished}
+			bind:isPaused
+			{onMoveMino}
+			{onSlideDown}
+			{onHardDrop}
+		/>
+	</div>
+
+	<div class="mt-3 text-lg w-280px hidden sm:block">
+		<p class="flex justify-between">← <span>左移動</span></p>
+		<p class="flex justify-between">→<span>右移動</span></p>
+		<p class="flex justify-between">↓<span>下移動</span></p>
+		<p class="flex justify-between">↑ x<span>右回転</span></p>
+		<p class="flex justify-between">z<span>左回転</span></p>
+		<p class="flex justify-between">Space<span>下まで落下</span></p>
+		<p class="flex justify-between">P<span>ポーズ ON/OFF</span></p>
 	</div>
 </div>
