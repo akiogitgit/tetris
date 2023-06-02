@@ -1,7 +1,6 @@
 <script lang="ts">
 	import {
 		ableToSlideRight,
-		ableToSlideDown,
 		ableToSlideLeft,
 		ableToRotateRight,
 		ableToRotateLeft

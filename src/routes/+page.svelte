@@ -20,26 +20,6 @@
 	} from './game'
 	import ControlPanel from '../components/ControlPanel.svelte'
 
-	// ルール
-	// 20 * 10
-	// ミノは7種類でワールドルール
-	// 自由落下する。時間経過で増加
-	// ミノはランダムに落ちてくる。7つが1セットでランダムに降る
-	// 左右に移動、90度回転
-	// ハードドロップ
-
-	// 色付ける
-	// ボタン付ける
-	// 一列を消す
-	// nextMinoを2つだけ表示
-	// Fieldsの上を隠す
-	// ハードドロップ、ゴーストブロック
-	// 得点
-	// 落下速度は初期値0.8s
-	// ミノを消す度レベルが上がり、落下速度が上がる
-
-	// キー操作説明
-
 	let fields: Field[][] = [...Array(FIELD_HIGHT)].map((_, y) =>
 		[...Array(FIELD_WIDTH)].map(() => null)
 	)
@@ -49,7 +29,7 @@
 
 	let isFinished = false
 	let score = 0 // 1列50点、2:200, 3:450, 4:800
-	let line = 0
+	let deletedLines = 0
 	let level = 1 // 10ライン消すごとに1上がる
 	const initDropSpeed = 0.8
 	let dropSpeed = initDropSpeed
@@ -101,8 +81,8 @@
 		const deleteLine = deletedFields.deleteLineCount
 		fields = deletedFields.fields
 		score += deleteLine * deleteLine * 50
-		line += deleteLine
-		level = Math.ceil((line + 1) / 10)
+		deletedLines += deleteLine
+		level = Math.ceil((deletedLines + 1) / 10)
 		dropSpeed = initDropSpeed ** level
 
 		startGame()
@@ -170,7 +150,7 @@
 <div>
 	{#if isFinished}
 		<p
-			class="bg-gradient-to-r bg-clip-text font-bold from-red-600 via-violet-400 to-blue-600 text-transparent pb-3 text-6xl"
+			class="bg-gradient-to-r bg-clip-text font-bold from-red-600 via-violet-400 to-blue-600 text-transparent pb-3 text-5xl sm:text-6xl"
 		>
 			GAME OVER
 		</p>
@@ -183,7 +163,7 @@
 
 			<div class="flex flex-col mx-auto text-center text-lg gap-3">
 				<p>レベル<span class="font-bold block">{level}</span></p>
-				<p>ライン <span class="font-bold block">{line}</span></p>
+				<p>ライン <span class="font-bold block">{deletedLines}</span></p>
 				<p>スコア <span class="font-bold block">{score}</span></p>
 			</div>
 		</div>
