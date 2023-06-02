@@ -3,7 +3,6 @@
 
 	export let fields: Field[][] = []
 	export let dropPoint: ActiveMino = []
-	export let activeMino: ActiveMino = []
 </script>
 
 <div class="border-black border-2">

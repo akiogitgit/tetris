@@ -165,40 +165,15 @@
 		deleteLine() // 列を消す
 		changeNextMino() // 次のミノ
 	}
-
-	let screenSize: number
 </script>
 
-<!-- windowの横幅を取得 -->
-<svelte:window bind:innerWidth={screenSize} />
-
-<div class="flex pb-10 gap-3 items-start sm:items-stretch">
+<div class="flex mb-8 gap-3 items-start">
+	<!-- <div class="flex pb-10 gap-3 items-start sm:items-stretch"> -->
 	<!-- フィールド -->
 	<div>
-		<Fields {fields} {dropPoint} {activeMino} />
-		{#if screenSize <= 640}
-			<div class="mt-3 grid place-items-center">
-				<ControlPanel
-					{fields}
-					{activeMino}
-					{isFinished}
-					bind:isPaused
-					{onMoveMino}
-					{onSlideDown}
-					{onHardDrop}
-				/>
-			</div>
-		{/if}
-	</div>
-	<div class="flex flex-col gap-3 justify-between items-start">
-		<NextMino {randomMinos} />
-
-		<div>
-			<p>レベル {level}</p>
-			<p>スコア {score}</p>
-			<p>ライン {line}</p>
-		</div>
-		{#if screenSize > 640}
+		<Fields {fields} {dropPoint} />
+		<div class="mt-3 grid place-items-center sm:hidden">
+			<!-- <div class="mt-3"> -->
 			<ControlPanel
 				{fields}
 				{activeMino}
@@ -208,6 +183,16 @@
 				{onSlideDown}
 				{onHardDrop}
 			/>
-		{/if}
+		</div>
+	</div>
+	<div class="flex flex-col gap-3 justify-between items-start">
+		<NextMino {randomMinos} />
+
+		<!-- class="flex flex-col text-lg text-center gap-3 items-center justify-center" -->
+		<div class="flex flex-col mx-auto text-center text-lg gap-3">
+			<p>レベル<span class="font-bold block">{level}</span></p>
+			<p>ライン <span class="font-bold block">{line}</span></p>
+			<p>スコア <span class="font-bold block">{score}</span></p>
+		</div>
 	</div>
 </div>
