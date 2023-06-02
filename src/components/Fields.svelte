@@ -13,7 +13,7 @@
 		>
 			{#each field1 as field, x (x)}
 				<div
-					class={`h-6 w-6 sm:(h-7 w-7)
+					class={`h-5 w-5 sm:(h-7 w-7)
 					${
 						dropPoint
 							.flat()

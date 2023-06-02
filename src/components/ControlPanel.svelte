@@ -92,7 +92,7 @@
 <!-- ボタン、キーボード操作 -->
 <svelte:window on:keydown={handleKeydown} />
 
-<div class="flex w-fit gap-3 touch-manipulation items-center">
+<div class="flex gap-3 touch-manipulation items-center">
 	<div class="flex flex-col gap-3">
 		<div class="h-11 text-center">
 			<button
