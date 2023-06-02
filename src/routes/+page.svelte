@@ -168,6 +168,13 @@
 </script>
 
 <div>
+	{#if !isFinished}
+		<p
+			class="bg-gradient-to-r bg-clip-text font-bold from-red-600 via-violet-400 to-blue-600 text-transparent pb-3 text-6xl"
+		>
+			ゲームオーバー
+		</p>
+	{/if}
 	<div class="flex gap-3 items-start">
 		<!-- フィールド -->
 		<Fields {fields} {dropPoint} />
