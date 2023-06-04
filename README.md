@@ -1,38 +1,43 @@
-# create-svelte
+## テトリス
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+このURLから遊べます
 
-## Creating a project
+https://svelte-tetris-ruby.vercel.app/
 
-If you're seeing this, you've probably already done this step. Congrats!
+- 動作プラットフォーム: Windows
+- 開発プラットフォーム: Windows
+- 開発言語: HTML/CSS, JavaScript(TypeScript)
+- 利用ライブラリ(フレームワーク): Svelte, Windi CSS
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+## src下のファイルの説明
+- components
+  - ComtrolPanel
+    - 引数
+      - fields: Field[][]
+      - isFinished: boolean
+      - isPaused: boolean
+      - activeMino: ActiveMino
+      - onMoveMino: (v: {fields: Field[][]; activeMino: ActiveMino}) => void
+      - onSlideDown: () => void
+      - onHardDrop: () => void
+    - 操作するボタン、キー操作を受け取るコンポーネント
+  - Fields
+    - 引数
+      - fields: Field[][]
+      - dropPoint: ActiveMino
+    - テトリスのフィールドを表示
+  - NextMino
+    - 引数
+      - randomMinos: Field[][][]
+    - 次に落ちてくるミノを2つ表示する
+- routes
+  - +layout
+    - +pageをラップする
+    - meta情報、画面のレイアウト、CSSのimportをする
+  - +page
+    - ページファイル。
+    - ページタイトル、Fields、NextMino、ControlPanelやスコア、操作説明を表示する
+  - game.ts
+    - リバーシの純粋関数のロジックを定義
+    - getPutAbleAllField、checkPutAbility、getReverseFields を定義
