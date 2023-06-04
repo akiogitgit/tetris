@@ -23,7 +23,7 @@
 	let fields: Field[][] = [...Array(FIELD_HIGHT)].map((_, y) =>
 		[...Array(FIELD_WIDTH)].map(() => null)
 	)
-	let randomMinos: Field[][][] = []
+	let nextMinos: Field[][][] = []
 	let activeMino: ActiveMino = []
 	let dropPoint: ActiveMino = []
 
@@ -60,13 +60,13 @@
 
 	const changeNextMino = () => {
 		// randomMinosが減ってきたら、後ろに補充
-		if (randomMinos.length <= 2) {
-			randomMinos = [...randomMinos, ...getRandomMinos()]
+		if (nextMinos.length <= 2) {
+			nextMinos = [...nextMinos, ...getRandomMinos()]
 		}
 
-		const [nextMino, ...rest] = randomMinos
-		activeMino = getNextActiveMino(nextMino) // randomMinos[0]
-		randomMinos = rest // randomMinos[1~6]
+		const [nextMino, ...rest] = nextMinos
+		activeMino = getNextActiveMino(nextMino) // nextMinos[0]
+		nextMinos = rest // nextMinos[1~6]
 
 		spawnMinoInField()
 
@@ -159,7 +159,7 @@
 		<!-- フィールド -->
 		<Fields {fields} {dropPoint} />
 		<div class="flex flex-col gap-3 justify-between items-start">
-			<NextMino {randomMinos} />
+			<NextMinos {nextMinos} />
 
 			<div class="flex flex-col mx-auto text-center text-lg gap-3">
 				<p>レベル<span class="font-bold block">{level}</span></p>
