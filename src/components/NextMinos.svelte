@@ -1,11 +1,11 @@
 <script lang="ts">
 	import type { Field } from '../routes/+page.svelte'
 
-	export let randomMinos: Field[][][] = []
+	export let nextMinos: Field[][][] = []
 </script>
 
 <div class="flex flex-col gap-3">
-	{#each randomMinos.slice(0, 2) as field1, y (y)}
+	{#each nextMinos.slice(0, 2) as field1, y (y)}
 		<div
 			class="border-black border-2 h-100px grid w-100px place-items-center sm:(h-140px w-140px)"
 		>
