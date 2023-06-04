@@ -9,6 +9,11 @@ https://svelte-tetris-ruby.vercel.app/
 - 開発言語: HTML/CSS, JavaScript(TypeScript)
 - 利用ライブラリ(フレームワーク): Svelte, Windi CSS
 
+![CPT2306050842-331x593](https://github.com/akiogitgit/tetris/assets/88410576/91b433cd-83ec-4a7f-a69f-1b013ff751cd)
+
+![CPT2306050849-332x597](https://github.com/akiogitgit/tetris/assets/88410576/4536e060-4693-43a2-bc44-743bf1f4375a)
+
+
 ## 変数・関数の説明
 
 ### +pageで定義している変数関数
