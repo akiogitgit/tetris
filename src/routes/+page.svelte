@@ -9,7 +9,7 @@
 
 <script lang="ts">
 	import Fields from '../components/Fields.svelte'
-	import NextMino from '../components/NextMino.svelte'
+	import NextMinos from '../components/NextMinos.svelte'
 	import {
 		ableToSlideDown,
 		getNextActiveMino,
@@ -19,6 +19,8 @@
 		execHardDrop
 	} from './game'
 	import ControlPanel from '../components/ControlPanel.svelte'
+	import KeyboardGuide from '../components/KeyboardGuide.svelte'
+	import Scoreboard from '../components/Scoreboard.svelte'
 
 	let fields: Field[][] = [...Array(FIELD_HIGHT)].map((_, y) =>
 		[...Array(FIELD_WIDTH)].map(() => null)
@@ -161,11 +163,7 @@
 		<div class="flex flex-col gap-3 justify-between items-start">
 			<NextMinos {nextMinos} />
 
-			<div class="flex flex-col mx-auto text-center text-lg gap-3">
-				<p>レベル<span class="font-bold block">{level}</span></p>
-				<p>ライン <span class="font-bold block">{deletedLines}</span></p>
-				<p>スコア <span class="font-bold block">{score}</span></p>
-			</div>
+			<Scoreboard {level} {deletedLines} {score} />
 		</div>
 	</div>
 
@@ -181,13 +179,7 @@
 		/>
 	</div>
 
-	<div class="mt-3 text-lg w-280px hidden sm:block">
-		<p class="flex justify-between">← <span>左移動</span></p>
-		<p class="flex justify-between">→<span>右移動</span></p>
-		<p class="flex justify-between">↓<span>下移動</span></p>
-		<p class="flex justify-between">↑ x<span>右回転</span></p>
-		<p class="flex justify-between">z<span>左回転</span></p>
-		<p class="flex justify-between">Space<span>下まで落下</span></p>
-		<p class="flex justify-between">P<span>ポーズ ON/OFF</span></p>
+	<div class="mt-3 w-280px hidden sm:block">
+		<KeyboardGuide />
 	</div>
 </div>
