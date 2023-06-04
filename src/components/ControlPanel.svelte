@@ -119,7 +119,13 @@
 					class="border-black border-2 p-1"
 				/>
 			</button>
-			<button on:click={onSlideDown} class="h-11 text-16px">
+			<button
+				on:click={() => {
+					if (isFinished || isPaused) return
+					onSlideDown()
+				}}
+				class="h-11 text-16px"
+			>
 				<Icon
 					icon={IconArrowDown}
 					height={44}
