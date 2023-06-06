@@ -13,6 +13,8 @@ https://svelte-tetris-ruby.vercel.app/
 
 ![CPT2306050849-332x597](https://github.com/akiogitgit/tetris/assets/88410576/4536e060-4693-43a2-bc44-743bf1f4375a)
 
+![image](https://github.com/akiogitgit/tetris/assets/88410576/8e0c9007-d4d2-4c56-b273-ad8c7595fcd9)
+
 
 ## 変数・関数の説明
 
